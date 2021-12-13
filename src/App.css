@@ -1,0 +1,11 @@
+.task_card {
+  background: #0000aa !important;
+}
+
+.scheduled_wo {
+  background: #00aa00 !important;
+}
+
+.maintenance_wo {
+  background: #aa0000 !important;
+}
