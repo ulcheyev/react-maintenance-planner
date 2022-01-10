@@ -247,10 +247,11 @@ export default class PlanningTool extends Component {
 
     let groups = Array.from(groupsMap, ([key, values]) => values);
 
-    groups = groups.reduce((accumulator, currentValue) => {
+    groups = groups.sort((a, b) => a.level - b.level).reduce((accumulator, currentValue) => {
       let item = accumulator.find(x => x.id === currentValue.parent);
       let index = accumulator.indexOf(item);
-      index = index !== -1 ? index + 1 : accumulator.length;
+      const count = accumulator.filter(x => x.parent === currentValue.parent).length;
+      index = index !== -1 ? index + count + 1 : accumulator.length;
       accumulator.splice(index, 0, currentValue);
       return accumulator;
     }, []);
