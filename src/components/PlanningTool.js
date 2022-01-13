@@ -34,8 +34,8 @@ export default class PlanningTool extends Component {
         });
       }
 
-      const date = moment(item["planned-start-time"]);
-      const endDate = moment(item["planned-end-time"]);
+      const date = moment(item.type === 'SessionPlan' ? item["start-time"] :item["planned-start-time"])
+      const endDate = moment(item.type === 'SessionPlan' ? item["end-time"] :item["planned-end-time"])
       items.push({
         id: items.length + 1,
         group: groupsMap.get(item.resource.id).id,

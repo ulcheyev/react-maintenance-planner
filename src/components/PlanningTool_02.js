@@ -39,11 +39,11 @@ export default class PlanningTool_02 extends Component {
       const bgColor = () => {
         switch (item['task-category']) {
           case 'task_card':
-            return '#aa0000';
+            return '#0000aa';
           case 'scheduled_wo':
             return '#00aa00';
           case 'maintenance_wo':
-            return '#0000aa';
+            return '#aa0000';
           default:
             return '#000';
         }
@@ -57,7 +57,7 @@ export default class PlanningTool_02 extends Component {
         className: item['task-category'],
         itemProps: {
           style: {
-            background: bgColor
+            background: bgColor()
           }
         }
       });
