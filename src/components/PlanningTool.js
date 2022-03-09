@@ -3,6 +3,7 @@ import moment from "moment";
 
 import Timeline from "react-calendar-timeline";
 import 'react-calendar-timeline/lib/Timeline.css';
+import Xarrow from "react-xarrows";
 
 const keys = {
   groupIdKey: "id",
@@ -19,17 +20,18 @@ const keys = {
 
 export default class PlanningTool extends Component {
 
-  buildData = (data, groupsMap, items, level, parentId) => {
+  /*buildData = (data, groupsMap, items, level, parentId) => {
     for (const item of data) {
-      if (!groupsMap.has(item.resource.id)) {
-        groupsMap.set(item.resource.id, {
+      const resourceId = groupsMap.size;
+      if (!groupsMap.has(resourceId)) {
+        groupsMap.set(resourceId, {
           id: groupsMap.size,
           title: item.resource ? item.resource.title : '',
           rightTitle: 'right title',
           hasChildren: item.planParts && item.planParts.length > 0,
           parent: parentId,
-          open: level < 1,
-          show: level < 2,
+          open: level < 0,
+          show: level < 1,
           level: level,
         });
       }
@@ -38,7 +40,7 @@ export default class PlanningTool extends Component {
       const endDate = moment(item.type === 'SessionPlan' ? item["end-time"] :item["planned-end-time"])
       items.push({
         id: items.length + 1,
-        group: groupsMap.get(item.resource.id).id,
+        group: groupsMap.get(resourceId).id,
         title: item.title,
         start: date,
         end: endDate,
@@ -46,7 +48,46 @@ export default class PlanningTool extends Component {
       })
 
       if (item.planParts && item.planParts.length > 0) {
-        this.buildData(item.planParts, groupsMap, items, level + 1, groupsMap.get(item.resource.id).id);
+        this.buildData(item.planParts, groupsMap, items, level + 1, groupsMap.get(resourceId).id);
+      }
+    }
+  }*/
+
+  buildData = (data, groupsMap, items, level, groupParentId, itemParentId) => {
+    for (const item of data) {
+      const resourceId = item.resource.id + " - " + item.resource.type;
+      if (!groupsMap.has(resourceId)) {
+        groupsMap.set(resourceId, {
+          id: groupsMap.size,
+          title: item.resource ? item.resource.title : '',
+          rightTitle: 'right title',
+          hasChildren: item.planParts && item.planParts.length > 0,
+          parent: groupParentId,
+          open: level < 1,
+          show: level < 2,
+          level: level,
+        });
+      }
+
+      const date = moment(item.type === 'SessionPlan' ? item["start-time"] : item["planned-start-time"])
+      const endDate = moment(item.type === 'SessionPlan' ? item["end-time"] : item["planned-end-time"])
+      const itemId = items.length + 1
+      items.push({
+        id: itemId,
+        group: groupsMap.get(resourceId).id,
+        title: item.title,
+        start: date,
+        end: endDate,
+        parent: itemParentId,
+        className: 'className',
+        bgColor: '#2196F3',
+        color: '#fff',
+        selectedBgColor: '#FFC107',
+        highlight: false
+      });
+
+      if (item.planParts && item.planParts.length > 0) {
+        this.buildData(item.planParts, groupsMap, items, level + 1, groupsMap.get(resourceId).id, itemId)
       }
     }
   }
@@ -54,7 +95,7 @@ export default class PlanningTool extends Component {
   constructor(props) {
     super(props);
 
-    const data = require('./../data.json');
+    const data = require('./../data3.json');
 
     const items = [];
     const groupsMap = new Map();
@@ -256,14 +297,22 @@ export default class PlanningTool extends Component {
       return accumulator;
     }, []);
 
+    /*    for(const g of groups){
+          console.log(g.title, items.filter(i => i.group === g.id))
+        }*/
+
+    items.find(i => i.id === 4).dependency = 3;
+    items.find(i => i.id === 5).dependency = 3;
     const defaultTimeStart = moment(items[0].start).add(-12, 'hour');
     const defaultTimeEnd = defaultTimeStart.clone().add(7, 'day');
+    const highlightedItems = []
 
     this.state = {
       groups,
       items,
       defaultTimeStart,
       defaultTimeEnd,
+      highlightedItems,
     };
   }
 
@@ -337,6 +386,91 @@ export default class PlanningTool extends Component {
     });
   };
 
+  highlightChildren = (item) => {
+    const items = this.state.items.filter(i => i.parent === item.id)
+    for (const item of items) {
+      item.highlight = true
+      this.state.highlightedItems.push(item)
+      this.highlightChildren(item)
+    }
+
+    /*const childrenGroups = this.state.groups.filter(group => group.parent === item.group)
+    for (const group of childrenGroups) {
+      const items = this.state.items
+      for (const item of items.filter(item => item.group === group.id)) {
+        item.highlight = true
+        this.state.highlightedItems.push(item)
+        this.highlightChildren(item)
+      }
+    }*/
+  }
+
+  removeHighlight = () => {
+    for (const item of this.state.highlightedItems) {
+      item.highlight = false
+    }
+    this.state.highlightedItems = []
+  }
+
+  itemRenderer = ({item, timelineContext, itemContext, getItemProps, getResizeProps}) => {
+    const {left: leftResizeProps, right: rightResizeProps} = getResizeProps();
+    const backgroundColor = itemContext.selected || item.highlight ? (itemContext.dragging ? "red" : item.selectedBgColor) : item.bgColor;
+    //const borderColor = itemContext.resizing ? "red" : '#000';//item.color;
+    return (
+      <div
+        {...getItemProps({
+          style: {
+            background: backgroundColor,
+            color: item.color,
+            /*borderColor: borderColor,
+            borderStyle: "solid",
+            borderRadius: 0,
+            borderTopWidth: 1,
+            borderBottomWidth: 1,
+            borderLeftWidth: itemContext.selected ? 3 : 1,
+            borderRightWidth: itemContext.selected ? 3 : 1*/
+          },
+          onMouseDown: () => {
+            item.selected = true
+            this.removeHighlight()
+            this.highlightChildren(item)
+            this.setState({
+              items: this.state.items
+            })
+          }
+        })}
+        id={'item-' + item.id}
+      >
+        {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : null}
+
+        <div
+          style={{
+            height: itemContext.dimensions.height,
+            overflow: "hidden",
+            paddingLeft: 3,
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap"
+          }}
+        >
+          {itemContext.title}
+        </div>
+
+        {item.dependency ?
+          <Xarrow
+            start={'item-' + item.dependency}
+            end={'item-' + item.id}
+            strokeWidth={2}
+            headSize={6}
+          />
+          :
+          ''
+        }
+
+        {itemContext.useResizeHandle ? <div {...rightResizeProps} /> : null}
+      </div>
+    );
+  }
+
   render() {
     const {groups, items, defaultTimeStart, defaultTimeEnd} = this.state;
 
@@ -368,6 +502,7 @@ export default class PlanningTool extends Component {
           sidebarWidth={250}
           defaultTimeStart={defaultTimeStart}
           defaultTimeEnd={defaultTimeEnd}
+          itemRenderer={this.itemRenderer}
           onItemMove={this.handleItemMove}
           onItemResize={this.handleItemResize}
         />
