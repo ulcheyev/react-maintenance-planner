@@ -305,14 +305,12 @@ export default class PlanningTool extends Component {
     items.find(i => i.id === 5).dependency = 3;
     const defaultTimeStart = moment(items[0].start).add(-12, 'hour');
     const defaultTimeEnd = defaultTimeStart.clone().add(7, 'day');
-    const highlightedItems = []
 
     this.state = {
       groups,
       items,
       defaultTimeStart,
       defaultTimeEnd,
-      highlightedItems,
     };
   }
 
@@ -390,7 +388,6 @@ export default class PlanningTool extends Component {
     const items = this.state.items.filter(i => i.parent === item.id)
     for (const item of items) {
       item.highlight = true
-      this.state.highlightedItems.push(item)
       this.highlightChildren(item)
     }
 
@@ -406,11 +403,13 @@ export default class PlanningTool extends Component {
   }
 
   removeHighlight = () => {
-    for (const item of this.state.highlightedItems) {
+    const items = this.state.items.filter(item => item.highlight)
+    for (const item of items) {
       item.highlight = false
     }
+
     this.setState({
-      highlightedItems: []
+      items: items
     })
   }
 
