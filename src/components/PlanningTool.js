@@ -409,7 +409,9 @@ export default class PlanningTool extends Component {
     for (const item of this.state.highlightedItems) {
       item.highlight = false
     }
-    this.state.highlightedItems = []
+    this.setState({
+      highlightedItems: []
+    })
   }
 
   itemRenderer = ({item, timelineContext, itemContext, getItemProps, getResizeProps}) => {
