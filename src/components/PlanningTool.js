@@ -57,6 +57,22 @@ export default class PlanningTool extends Component {
     }
   }*/
 
+  getTaskBackground = (task) => {
+    if (!task['task-type']) {
+      return '#2196F3'
+    }
+    switch (task['task-type']['task-category']) {
+      case 'scheduled_wo':
+        return '#aa0000'
+      case 'task_card':
+        return '#00aa00'
+      case 'maintenance_wo':
+        return '#0000aa'
+      default:
+        return '#2196F3'
+    }
+  }
+
   buildData = (data, groupsMap, items, level, groupParentId, itemParentId) => {
     for (const item of data) {
       const resourceId = item.resource.id + " - " + item.resource.type;
@@ -76,6 +92,7 @@ export default class PlanningTool extends Component {
       const date = moment(item.type === 'SessionPlan' ? item["start-time"] : item["planned-start-time"]).add('1', 'year').add('2', 'month').add('27', 'day')
       const endDate = moment(item.type === 'SessionPlan' ? item["end-time"] : item["planned-end-time"]).add('1', 'year').add('2', 'month').add('27', 'day')
       const itemId = items.length + 1
+
       items.push({
         id: itemId,
         group: groupsMap.get(resourceId).id,
@@ -84,7 +101,7 @@ export default class PlanningTool extends Component {
         end: endDate,
         parent: itemParentId,
         className: 'className',
-        bgColor: '#2196F3',
+        bgColor: this.getTaskBackground(item),
         color: '#fff',
         selectedBgColor: '#FFC107',
         highlight: false
@@ -311,13 +328,18 @@ export default class PlanningTool extends Component {
     const defaultTimeEnd = defaultTimeStart.clone().add(7, 'day');
 
     const sidebarWidth = 250;
+    const popup = {
+      open: false,
+      item: null,
+    }
 
     this.state = {
       groups,
       items,
       defaultTimeStart,
       defaultTimeEnd,
-      sidebarWidth
+      sidebarWidth,
+      popup
     };
   }
 
@@ -330,8 +352,8 @@ export default class PlanningTool extends Component {
       items: items.map(item =>
         item.id === itemId
           ? Object.assign({}, item, {
-            start: dragTime,
-            end: dragTime + (item.end - item.start),
+            start: moment(dragTime),
+            end: moment(dragTime + (item.end - item.start)),
             group: group.id
           })
           : item
@@ -349,8 +371,8 @@ export default class PlanningTool extends Component {
       items: items.map(item =>
         item.id === itemId
           ? Object.assign({}, item, {
-            start: edge === "left" ? time : item.start,
-            end: edge === "left" ? item.end : time
+            start: moment(edge === "left" ? time : item.start),
+            end: moment(edge === "left" ? item.end : time)
           })
           : item
       ),
@@ -443,6 +465,7 @@ export default class PlanningTool extends Component {
             item.selected = true
             this.removeHighlight()
             this.highlightChildren(item)
+            this.showItemInfo(this.state.items.find(i => i.id === item.id))
             this.setState({
               items: this.state.items
             })
@@ -485,7 +508,10 @@ export default class PlanningTool extends Component {
     this.removeHighlight()
 
     this.setState({
-      items: this.state.items
+      items: this.state.items,
+      popup: {
+        open: false,
+      }
     })
   }
 
@@ -497,14 +523,26 @@ export default class PlanningTool extends Component {
     this.setState({
       draggedItem: {item: item, group: this.state.groups.filter(g => g.show)[newGroupOrder], time}
     });
-  };
+  }
+
+  showItemInfo = (item) => {
+    if (!item) {
+      return
+    }
+    this.setState({
+      popup: {
+        open: true,
+        item: item,
+      }
+    })
+  }
 
   resizeSidebar = () => {
 
   }
 
   render() {
-    const {groups, items, defaultTimeStart, defaultTimeEnd, sidebarWidth} = this.state;
+    const {groups, items, defaultTimeStart, defaultTimeEnd, sidebarWidth, popup, draggedItem} = this.state;
 
     const newGroups = groups.filter((g) => g.show).map((group) => {
       return Object.assign({}, group, {
@@ -543,13 +581,47 @@ export default class PlanningTool extends Component {
           <TodayMarker interval={1000}/>
         </Timeline>
 
-        {this.state.draggedItem && (
+        {draggedItem && (
           <InfoLabel
-            item={this.state.draggedItem.item}
-            group={this.state.draggedItem.group}
-            time={this.state.draggedItem.time}
+            item={draggedItem.item}
+            group={draggedItem.group}
+            time={draggedItem.time}
           />
         )}
+
+        {popup.open && (
+          <div className="popup">
+            <div className="popup-body">
+              <h3>{popup.item.title}</h3>
+              <div className="dates">
+                <h4>Date</h4>
+                <span className="date date-from">
+                  From: {popup.item.start.format('LLL')}
+                </span>
+                <br/>
+                <span className="date date-to">
+                  To: {popup.item.end?.format('LLL')}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="explanatory-notes">
+          <h3>Task types</h3>
+          <div className="note">
+            <span className="color scheduled-wo"/>
+            Scheduled_wo
+          </div>
+          <div className="note">
+            <span className="color task-card"/>
+            Task_card
+          </div>
+          <div className="note">
+            <span className="color maintenance-wo"/>
+            Maintenance_wo
+          </div>
+        </div>
       </div>
     )
   }

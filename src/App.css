@@ -26,3 +26,28 @@
   cursor: ew-resize;
   z-index: 100;
 }
+
+
+.explanatory-notes, .popup {
+  margin:25px;
+  padding: 15px 25px 35px 25px;
+  border: 1px solid #333;
+  width: 350px;
+}
+
+.explanatory-notes .note .color{
+  display: inline-block;
+  background-color: #000;
+  width: 20px;
+  height: 10px;
+  margin-right: 7px;
+}
+.explanatory-notes .note .color.scheduled-wo{
+  background-color: #aa0000;
+}
+.explanatory-notes .note .color.task-card{
+  background-color: #00aa00;
+}
+.explanatory-notes .note .color.maintenance-wo{
+  background-color: #0000aa;
+}
