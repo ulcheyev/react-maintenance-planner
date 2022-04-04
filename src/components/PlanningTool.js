@@ -1,9 +1,13 @@
 import React, {Component} from "react";
 import moment from "moment";
 
-import Timeline from "react-calendar-timeline";
+import Timeline, {
+  TodayMarker
+} from "react-calendar-timeline";
+import InfoLabel from "./InfoLabel";
 import 'react-calendar-timeline/lib/Timeline.css';
 import Xarrow from "react-xarrows";
+import ReactDOM from "react-dom";
 
 const keys = {
   groupIdKey: "id",
@@ -69,8 +73,8 @@ export default class PlanningTool extends Component {
         });
       }
 
-      const date = moment(item.type === 'SessionPlan' ? item["start-time"] : item["planned-start-time"])
-      const endDate = moment(item.type === 'SessionPlan' ? item["end-time"] : item["planned-end-time"])
+      const date = moment(item.type === 'SessionPlan' ? item["start-time"] : item["planned-start-time"]).add('1', 'year').add('2', 'month').add('27', 'day')
+      const endDate = moment(item.type === 'SessionPlan' ? item["end-time"] : item["planned-end-time"]).add('1', 'year').add('2', 'month').add('27', 'day')
       const itemId = items.length + 1
       items.push({
         id: itemId,
@@ -306,11 +310,14 @@ export default class PlanningTool extends Component {
     const defaultTimeStart = moment(items[0].start).add(-12, 'hour');
     const defaultTimeEnd = defaultTimeStart.clone().add(7, 'day');
 
+    const sidebarWidth = 250;
+
     this.state = {
       groups,
       items,
       defaultTimeStart,
       defaultTimeEnd,
+      sidebarWidth
     };
   }
 
@@ -328,7 +335,8 @@ export default class PlanningTool extends Component {
             group: group.id
           })
           : item
-      )
+      ),
+      draggedItem: undefined
     });
 
     // console.log("Moved", itemId, dragTime, newGroupOrder);
@@ -345,7 +353,8 @@ export default class PlanningTool extends Component {
             end: edge === "left" ? item.end : time
           })
           : item
-      )
+      ),
+      draggedItem: undefined
     });
 
     console.log("Resized", itemId, time, edge);
@@ -407,15 +416,14 @@ export default class PlanningTool extends Component {
     for (const item of items) {
       item.highlight = false
     }
-
-    this.setState({
-      items: items
-    })
   }
 
   itemRenderer = ({item, timelineContext, itemContext, getItemProps, getResizeProps}) => {
     const {left: leftResizeProps, right: rightResizeProps} = getResizeProps();
-    const backgroundColor = itemContext.selected || item.highlight ? (itemContext.dragging ? "red" : item.selectedBgColor) : item.bgColor;
+    let backgroundColor = itemContext.selected ? (itemContext.dragging ? "red" : item.selectedBgColor) : item.bgColor;
+    if (item.highlight) {
+      backgroundColor = '#FFA500';
+    }
     //const borderColor = itemContext.resizing ? "red" : '#000';//item.color;
     return (
       <div
@@ -438,7 +446,8 @@ export default class PlanningTool extends Component {
             this.setState({
               items: this.state.items
             })
-          }
+          },
+
         })}
         id={'item-' + item.id}
       >
@@ -472,8 +481,30 @@ export default class PlanningTool extends Component {
     );
   }
 
+  itemDeselected = (item) => {
+    this.removeHighlight()
+
+    this.setState({
+      items: this.state.items
+    })
+  }
+
+  handleItemDrag = ({eventType, itemId, time, edge, newGroupOrder}) => {
+    let item = this.state.draggedItem ? this.state.draggedItem.item : undefined;
+    if (!item) {
+      item = this.state.items.find(i => i.id === itemId);
+    }
+    this.setState({
+      draggedItem: {item: item, group: this.state.groups.filter(g => g.show)[newGroupOrder], time}
+    });
+  };
+
+  resizeSidebar = () => {
+
+  }
+
   render() {
-    const {groups, items, defaultTimeStart, defaultTimeEnd} = this.state;
+    const {groups, items, defaultTimeStart, defaultTimeEnd, sidebarWidth} = this.state;
 
     const newGroups = groups.filter((g) => g.show).map((group) => {
       return Object.assign({}, group, {
@@ -486,7 +517,7 @@ export default class PlanningTool extends Component {
           <div style={{paddingLeft: group.level * 20}}>{group.title}</div>
         )
       })
-    });
+    })
 
     return (
       <div>
@@ -500,14 +531,31 @@ export default class PlanningTool extends Component {
           itemHeightRatio={0.75}
           canMove={true}
           canResize={"both"}
-          sidebarWidth={250}
+          sidebarWidth={sidebarWidth}
           defaultTimeStart={defaultTimeStart}
           defaultTimeEnd={defaultTimeEnd}
           itemRenderer={this.itemRenderer}
           onItemMove={this.handleItemMove}
           onItemResize={this.handleItemResize}
-        />
+          onItemDeselect={this.itemDeselected}
+          onItemDrag={this.handleItemDrag}
+        >
+          <TodayMarker interval={1000}/>
+        </Timeline>
+
+        {this.state.draggedItem && (
+          <InfoLabel
+            item={this.state.draggedItem.item}
+            group={this.state.draggedItem.group}
+            time={this.state.draggedItem.time}
+          />
+        )}
       </div>
-    );
+    )
+  }
+
+  componentDidMount() {
+    const sidebar = document.querySelector('.rct-sidebar')
+    // ReactDOM.render(<div className={'xy'}></div>, sidebar)
   }
 }

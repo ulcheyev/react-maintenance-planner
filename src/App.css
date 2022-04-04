@@ -9,3 +9,20 @@
 .maintenance_wo {
   background: #aa0000 !important;
 }
+
+.rct-sidebar {
+  position: relative;
+  padding-right: 4px;
+}
+
+.rct-sidebar::after {
+  content: '';
+  background-color: #ccc;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  cursor: ew-resize;
+  z-index: 100;
+}

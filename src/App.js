@@ -3,7 +3,7 @@
   CustomMarker,
 } from 'react-calendar-timeline'*/
 // import moment from 'moment'
-// import './App.css';
+import './App.css';
 import PlanningTool from "./components/PlanningTool.js";
 
 // const data = require('./test.json');
