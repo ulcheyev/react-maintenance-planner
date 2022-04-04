@@ -1,7 +1,7 @@
 import React from "react";
 import moment from "moment";
 
-export default ({ item, group, time }) => {
+const infoBar =  ({ item, group, time }) => {
   const date = moment(time, "x");
   const label = group ? group.title : "";
   return (
@@ -23,3 +23,5 @@ export default ({ item, group, time }) => {
     </div>
   );
 };
+
+export default infoBar

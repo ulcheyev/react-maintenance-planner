@@ -7,7 +7,7 @@ import Timeline, {
 import InfoLabel from "./InfoLabel";
 import 'react-calendar-timeline/lib/Timeline.css';
 import Xarrow from "react-xarrows";
-import ReactDOM from "react-dom";
+
 
 const keys = {
   groupIdKey: "id",
@@ -627,7 +627,7 @@ export default class PlanningTool extends Component {
   }
 
   componentDidMount() {
-    const sidebar = document.querySelector('.rct-sidebar')
+    // const sidebar = document.querySelector('.rct-sidebar')
     // ReactDOM.render(<div className={'xy'}></div>, sidebar)
   }
 }
