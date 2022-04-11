@@ -2,29 +2,47 @@
   "name": "planning-tool",
   "version": "0.1.0",
   "private": true,
+  "source": "src/index.js",
+  "main": "dist/PlanningTool.js",
+  "module": "dist/PlanningTool.module.js",
+  "unpkg": "dist/PlanningTool.umd.js",
   "dependencies": {
-    "@testing-library/jest-dom": "^5.15.0",
-    "@testing-library/react": "^11.2.7",
-    "@testing-library/user-event": "^12.8.3",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^12.1.4",
+    "@testing-library/user-event": "^13.5.0",
+    "classnames": "^2.3.1",
     "interactjs": "^1.10.11",
-    "moment": "^2.29.1",
-    "react": "^17.0.2",
-    "react-calendar-timeline": "^0.27.0",
-    "react-dom": "^17.0.2",
-    "react-scripts": "4.0.3",
+    "lodash.isequal": "^4.5.0",
+    "moment": "^2.29.2",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-scripts": "5.0.0",
     "react-xarrows": "^2.0.2",
-    "web-vitals": "^1.1.2"
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
+    "dev": "start-storybook -p 6006 -s public",
     "build": "react-scripts build",
+    "build:lib": "microbundle --jsx React.createElement --jsxFragment React.Fragment --jsxImportSource react",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "build-storybook": "build-storybook -s public"
   },
   "eslintConfig": {
     "extends": [
       "react-app",
       "react-app/jest"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "**/*.stories.*"
+        ],
+        "rules": {
+          "import/no-anonymous-default-export": "off"
+        }
+      }
     ]
   },
   "browserslist": {
@@ -38,5 +56,21 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@storybook/addon-actions": "^6.4.21",
+    "@storybook/addon-essentials": "^6.4.21",
+    "@storybook/addon-interactions": "^6.4.21",
+    "@storybook/addon-links": "^6.4.21",
+    "@storybook/builder-webpack5": "^6.4.21",
+    "@storybook/manager-webpack5": "^6.4.21",
+    "@storybook/node-logger": "^6.4.21",
+    "@storybook/preset-create-react-app": "^4.1.0",
+    "@storybook/react": "^6.4.21",
+    "@storybook/testing-library": "^0.0.9",
+    "memoize-one": "^6.0.0",
+    "microbundle": "^0.14.2",
+    "prop-types": "^15.8.1",
+    "webpack": "^5.72.0"
   }
 }
