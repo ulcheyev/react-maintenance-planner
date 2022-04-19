@@ -12,7 +12,7 @@ export default class Sidebar extends Component {
     keys: PropTypes.object.isRequired,
     groupRenderer: PropTypes.func,
     isRightSidebar: PropTypes.bool,
-    handleSidebarResize: PropTypes.func,
+    handleSidebarResize: PropTypes.object,
   }
 
   constructor(props) {

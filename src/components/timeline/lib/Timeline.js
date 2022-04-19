@@ -76,7 +76,7 @@ export default class ReactCalendarTimeline extends Component {
     onCanvasContextMenu: PropTypes.func,
     onZoom: PropTypes.func,
     onItemDrag: PropTypes.func,
-    handleSidebarResize: PropTypes.func,
+    handleSidebarResize: PropTypes.object,
 
     moveResizeValidator: PropTypes.func,
 

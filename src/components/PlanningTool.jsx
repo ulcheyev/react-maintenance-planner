@@ -67,7 +67,6 @@ class PlanningTool extends Component {
       sidebarWidth,
       sidebarResizing,
       popup,
-      props
     }
   }
 
@@ -205,16 +204,6 @@ class PlanningTool extends Component {
       item.highlight = true
       this.highlightChildren(item)
     }
-
-    /*const childrenGroups = this.state.groups.filter(group => group.parent === item.group)
-    for (const group of childrenGroups) {
-      const items = this.state.items
-      for (const item of items.filter(item => item.group === group.id)) {
-        item.highlight = true
-        this.state.highlightedItems.push(item)
-        this.highlightChildren(item)
-      }
-    }*/
   }
 
   removeHighlight = () => {
@@ -230,20 +219,13 @@ class PlanningTool extends Component {
     if (item.highlight) {
       backgroundColor = '#FFA500'
     }
-    //const borderColor = itemContext.resizing ? "red" : '#000'//item.color
+
     return (
       <div
         {...getItemProps({
           style: {
             background: backgroundColor,
             color: item.color,
-            /*borderColor: borderColor,
-            borderStyle: "solid",
-            borderRadius: 0,
-            borderTopWidth: 1,
-            borderBottomWidth: 1,
-            borderLeftWidth: itemContext.selected ? 3 : 1,
-            borderRightWidth: itemContext.selected ? 3 : 1*/
           },
           onMouseDown: () => {
             item.selected = true
@@ -334,7 +316,6 @@ class PlanningTool extends Component {
   }
 
   onSidebarMove = (e) => {
-    console.log(e.target)
     e.stopPropagation()
     e.preventDefault()
     if (!this.state.sidebarResizing) {
