@@ -1,0 +1,717 @@
+[
+  {
+    "type": "RevisionPlan",
+    "id": 1641323673472,
+    "title": "revision 13324",
+    "resource": {
+      "type": "",
+      "id": 1,
+      "title": ""
+    },
+    "duration": 86400000,
+    "planParts": [
+      {
+        "type": "PhasePlan",
+        "id": 1641323673429,
+        "title": "phase 3",
+        "resource": {
+          "type": "Aircraft",
+          "id": 1641323673422,
+          "title": "aircraft 111"
+        },
+        "duration": 61200000,
+        "planParts": [
+          {
+            "type": "GeneralTaskPlan",
+            "id": 1641323673468,
+            "title": "Servicing",
+            "resource": {
+              "type": "AircraftArea",
+              "id": 1641323673466,
+              "title": "Fuselage"
+            },
+            "duration": 61200000,
+            "planParts": [
+              {
+                "type": "TaskPlan",
+                "id": 1641323673328,
+                "title": "342200-02-1-000\nSTANDBY ALTITUDE AND HEADING",
+                "resource": {
+                  "type": "MaintenanceGroup",
+                  "id": 1641323673354,
+                  "title": "AVIO"
+                },
+                "duration": 16200000,
+                "planParts": [
+                  {
+                    "type": "SessionPlan",
+                    "id": 1641323673398,
+                    "title": null,
+                    "resource": {
+                      "type": "Mechanic",
+                      "id": 1641323673398,
+                      "title": "mechanic 7"
+                    },
+                    "duration": 7200000,
+                    "planned-start-time": null,
+                    "planned-end-time": null,
+                    "planned-duration": null,
+                    "planned-work-time": null,
+                    "start-time": 1609515000000,
+                    "end-time": 1609522200000,
+                    "work-time": 7200000
+                  },
+                  {
+                    "type": "SessionPlan",
+                    "id": 1641323673394,
+                    "title": null,
+                    "resource": {
+                      "type": "Mechanic",
+                      "id": 1641323673394,
+                      "title": "mechanic 6"
+                    },
+                    "duration": 5400000,
+                    "planned-start-time": null,
+                    "planned-end-time": null,
+                    "planned-duration": null,
+                    "planned-work-time": null,
+                    "start-time": 1609506000000,
+                    "end-time": 1609511400000,
+                    "work-time": 5400000
+                  }
+                ],
+                "planned-start-time": 1609495200000,
+                "planned-end-time": 1609603200000,
+                "planned-duration": null,
+                "planned-work-time": 18000000,
+                "start-time": 1609506000000,
+                "end-time": 1609567200000,
+                "work-time": 12600000,
+                "task-type": {
+                  "type": "TaskType",
+                  "id": "342200-02-1-000",
+                  "label": "STANDBY ALTITUDE AND HEADING",
+                  "scope": "AVIO",
+                  "acmodel": null,
+                  "area": "Fuselage",
+                  "mpdtask": null,
+                  "phase": "phase 3",
+                  "taskType": "Servicing",
+                  "task-category": "scheduled_wo"
+                }
+              }
+            ],
+            "planned-start-time": 1609495200000,
+            "planned-end-time": 1609603200000,
+            "planned-duration": 108000000,
+            "planned-work-time": 18000000,
+            "start-time": 1609506000000,
+            "end-time": 1609567200000,
+            "work-time": 12600000
+          }
+        ],
+        "planned-start-time": 1609495200000,
+        "planned-end-time": 1609603200000,
+        "planned-duration": 108000000,
+        "planned-work-time": 18000000,
+        "start-time": 1609506000000,
+        "end-time": 1609567200000,
+        "work-time": 12600000
+      },
+      {
+        "type": "PhasePlan",
+        "id": 1641323673426,
+        "title": "phase 1",
+        "resource": {
+          "type": "Aircraft",
+          "id": 1641323673422,
+          "title": "aircraft 111"
+        },
+        "duration": 86400000,
+        "planParts": [
+          {
+            "type": "GeneralTaskPlan",
+            "id": 1641323673442,
+            "title": "Optional Check",
+            "resource": {
+              "type": "AircraftArea",
+              "id": 1641323673439,
+              "title": "FWD/AFT Wet Area"
+            },
+            "duration": 86400000,
+            "planParts": [
+              {
+                "type": "TaskPlan",
+                "id": 1641323673339,
+                "title": "527300-01-1-210\nEMERGENCY ESCAPE SLIDE RELEASE AND OVERPRESSURE WARNING SYSTEMS",
+                "resource": {
+                  "type": "MaintenanceGroup",
+                  "id": 1641323673363,
+                  "title": "AVIO"
+                },
+                "duration": null,
+                "planParts": [],
+                "planned-start-time": 1609660800000,
+                "planned-end-time": 1609732800000,
+                "planned-duration": null,
+                "planned-work-time": 37800000,
+                "start-time": null,
+                "end-time": null,
+                "work-time": 0,
+                "task-type": {
+                  "type": "TaskType",
+                  "id": "527300-01-1-210",
+                  "label": "EMERGENCY ESCAPE SLIDE RELEASE AND OVERPRESSURE WARNING SYSTEMS",
+                  "scope": "AVIO",
+                  "acmodel": null,
+                  "area": "FWD/AFT Wet Area",
+                  "mpdtask": null,
+                  "phase": "phase 1",
+                  "taskType": "Optional Check",
+                  "task-category": "task_card"
+                }
+              }
+            ],
+            "planned-start-time": 1609660800000,
+            "planned-end-time": 1609732800000,
+            "planned-duration": 72000000,
+            "planned-work-time": 37800000,
+            "start-time": 1609480800000,
+            "end-time": 1609567200000,
+            "work-time": 0
+          },
+          {
+            "type": "GeneralTaskPlan",
+            "id": 1641323673459,
+            "title": "Check",
+            "resource": {
+              "type": "AircraftArea",
+              "id": 1641323673451,
+              "title": "Cockpit"
+            },
+            "duration": 84600000,
+            "planParts": [
+              {
+                "type": "TaskPlan",
+                "id": 1641323673325,
+                "title": "291000-20-1-600\nHYDRAULIC FIRE SHUT OFF VALVES",
+                "resource": {
+                  "type": "MaintenanceGroup",
+                  "id": 1641323673351,
+                  "title": "MECH-ENG"
+                },
+                "duration": 25200000,
+                "planParts": [
+                  {
+                    "type": "SessionPlan",
+                    "id": 1641323673387,
+                    "title": null,
+                    "resource": {
+                      "type": "Mechanic",
+                      "id": 1641323673387,
+                      "title": "mechanic 4"
+                    },
+                    "duration": 1800000,
+                    "planned-start-time": null,
+                    "planned-end-time": null,
+                    "planned-duration": null,
+                    "planned-work-time": null,
+                    "start-time": 1609506000000,
+                    "end-time": 1609507800000,
+                    "work-time": 1800000
+                  },
+                  {
+                    "type": "SessionPlan",
+                    "id": 1641323673381,
+                    "title": null,
+                    "resource": {
+                      "type": "Mechanic",
+                      "id": 1641323673381,
+                      "title": "mechanic 3"
+                    },
+                    "duration": 1800000,
+                    "planned-start-time": null,
+                    "planned-end-time": null,
+                    "planned-duration": null,
+                    "planned-work-time": null,
+                    "start-time": 1609482600000,
+                    "end-time": 1609484400000,
+                    "work-time": 1800000
+                  }
+                ],
+                "planned-start-time": 1609480800000,
+                "planned-end-time": 1609588800000,
+                "planned-duration": null,
+                "planned-work-time": 7200000,
+                "start-time": 1609482600000,
+                "end-time": 1609567200000,
+                "work-time": 3600000,
+                "task-type": {
+                  "type": "TaskType",
+                  "id": "291000-20-1-600",
+                  "label": "HYDRAULIC FIRE SHUT OFF VALVES",
+                  "scope": "MECH-ENG",
+                  "acmodel": null,
+                  "area": "Cockpit",
+                  "mpdtask": null,
+                  "phase": "phase 1",
+                  "taskType": "Check",
+                  "task-category": "task_card"
+                }
+              }
+            ],
+            "planned-start-time": 1609480800000,
+            "planned-end-time": 1609588800000,
+            "planned-duration": 108000000,
+            "planned-work-time": 7200000,
+            "start-time": 1609482600000,
+            "end-time": 1609567200000,
+            "work-time": 3600000
+          },
+          {
+            "type": "GeneralTaskPlan",
+            "id": 1641323673454,
+            "title": "Functional Check",
+            "resource": {
+              "type": "AircraftArea",
+              "id": 1641323673451,
+              "title": "Cockpit"
+            },
+            "duration": 68400000,
+            "planParts": [
+              {
+                "type": "TaskPlan",
+                "id": 1641323673330,
+                "title": "291000-10-1-500\nHYDRAULIC FIRE SHUT OFF VALVES",
+                "resource": {
+                  "type": "MaintenanceGroup",
+                  "id": 1641323673357,
+                  "title": "ENG"
+                },
+                "duration": 5400000,
+                "planParts": [
+                  {
+                    "type": "SessionPlan",
+                    "id": 1641323673409,
+                    "title": null,
+                    "resource": {
+                      "type": "Mechanic",
+                      "id": 1641323673409,
+                      "title": "mechanic 9"
+                    },
+                    "duration": 1800000,
+                    "planned-start-time": null,
+                    "planned-end-time": null,
+                    "planned-duration": null,
+                    "planned-work-time": null,
+                    "start-time": 1609499700000,
+                    "end-time": 1609501500000,
+                    "work-time": 1800000
+                  },
+                  {
+                    "type": "SessionPlan",
+                    "id": 1641323673404,
+                    "title": null,
+                    "resource": {
+                      "type": "Mechanic",
+                      "id": 1641323673404,
+                      "title": "mechanic 8"
+                    },
+                    "duration": 5400000,
+                    "planned-start-time": null,
+                    "planned-end-time": null,
+                    "planned-duration": null,
+                    "planned-work-time": null,
+                    "start-time": 1609498800000,
+                    "end-time": 1609504200000,
+                    "work-time": 5400000
+                  }
+                ],
+                "planned-start-time": 1609498800000,
+                "planned-end-time": 1609606800000,
+                "planned-duration": null,
+                "planned-work-time": 18000000,
+                "start-time": 1609498800000,
+                "end-time": 1609567200000,
+                "work-time": 7200000,
+                "task-type": {
+                  "type": "TaskType",
+                  "id": "291000-10-1-500",
+                  "label": "HYDRAULIC FIRE SHUT OFF VALVES",
+                  "scope": "ENG",
+                  "acmodel": null,
+                  "area": "Cockpit",
+                  "mpdtask": null,
+                  "phase": "phase 1",
+                  "taskType": "Functional Check",
+                  "task-category": "scheduled_wo"
+                }
+              }
+            ],
+            "planned-start-time": 1609498800000,
+            "planned-end-time": 1609606800000,
+            "planned-duration": 108000000,
+            "planned-work-time": 18000000,
+            "start-time": 1609498800000,
+            "end-time": 1609567200000,
+            "work-time": 7200000
+          },
+          {
+            "type": "GeneralTaskPlan",
+            "id": 1641323673448,
+            "title": "Functional Check",
+            "resource": {
+              "type": "AircraftArea",
+              "id": 1641323673445,
+              "title": "Interior Body"
+            },
+            "duration": 46800000,
+            "planParts": [
+              {
+                "type": "TaskPlan",
+                "id": 1641323673334,
+                "title": "341300-07-1-210\nAIR DATA",
+                "resource": {
+                  "type": "MaintenanceGroup",
+                  "id": 1641323673359,
+                  "title": "AVIO"
+                },
+                "duration": 18900000,
+                "planParts": [
+                  {
+                    "type": "SessionPlan",
+                    "id": 1641323673415,
+                    "title": null,
+                    "resource": {
+                      "type": "Mechanic",
+                      "id": 1641323673415,
+                      "title": "mechanic 6"
+                    },
+                    "duration": 3600000,
+                    "planned-start-time": null,
+                    "planned-end-time": null,
+                    "planned-duration": null,
+                    "planned-work-time": null,
+                    "start-time": 1609520400000,
+                    "end-time": 1609524000000,
+                    "work-time": 3600000
+                  },
+                  {
+                    "type": "SessionPlan",
+                    "id": 1641323673419,
+                    "title": null,
+                    "resource": {
+                      "type": "Mechanic",
+                      "id": 1641323673419,
+                      "title": "mechanic 7"
+                    },
+                    "duration": 14400000,
+                    "planned-start-time": null,
+                    "planned-end-time": null,
+                    "planned-duration": null,
+                    "planned-work-time": null,
+                    "start-time": 1609524900000,
+                    "end-time": 1609539300000,
+                    "work-time": 14400000
+                  }
+                ],
+                "planned-start-time": 1609520400000,
+                "planned-end-time": 1609585200000,
+                "planned-duration": null,
+                "planned-work-time": 22799999,
+                "start-time": 1609520400000,
+                "end-time": 1609567200000,
+                "work-time": 18000000,
+                "task-type": {
+                  "type": "TaskType",
+                  "id": "341300-07-1-210",
+                  "label": "AIR DATA",
+                  "scope": "AVIO",
+                  "acmodel": null,
+                  "area": "Interior Body",
+                  "mpdtask": null,
+                  "phase": "phase 1",
+                  "taskType": "Functional Check",
+                  "task-category": "task_card"
+                }
+              }
+            ],
+            "planned-start-time": 1609520400000,
+            "planned-end-time": 1609585200000,
+            "planned-duration": 64800000,
+            "planned-work-time": 22799999,
+            "start-time": 1609520400000,
+            "end-time": 1609567200000,
+            "work-time": 18000000
+          },
+          {
+            "type": "GeneralTaskPlan",
+            "id": 1641323673457,
+            "title": "Optional Check",
+            "resource": {
+              "type": "AircraftArea",
+              "id": 1641323673451,
+              "title": "Cockpit"
+            },
+            "duration": 86400000,
+            "planParts": [
+              {
+                "type": "TaskPlan",
+                "id": 1641323673348,
+                "title": "282100-03-1-210\nMAIN FUEL PUMP SYSTEM",
+                "resource": {
+                  "type": "MaintenanceGroup",
+                  "id": 1641323673357,
+                  "title": "ENG"
+                },
+                "duration": null,
+                "planParts": [],
+                "planned-start-time": 1609859100000,
+                "planned-end-time": 1609967100000,
+                "planned-duration": null,
+                "planned-work-time": 37800000,
+                "start-time": null,
+                "end-time": null,
+                "work-time": 0,
+                "task-type": {
+                  "type": "TaskType",
+                  "id": "282100-03-1-210",
+                  "label": "MAIN FUEL PUMP SYSTEM",
+                  "scope": "ENG",
+                  "acmodel": null,
+                  "area": "Cockpit",
+                  "mpdtask": null,
+                  "phase": "phase 1",
+                  "taskType": "Optional Check",
+                  "task-category": "task_card"
+                }
+              },
+              {
+                "type": "TaskPlan",
+                "id": 1641323673344,
+                "title": "262200-02-1-210\nAPU FIRE EXTINGUISHING",
+                "resource": {
+                  "type": "MaintenanceGroup",
+                  "id": 1641323673368,
+                  "title": "AVIO"
+                },
+                "duration": null,
+                "planParts": [],
+                "planned-start-time": 1609772400000,
+                "planned-end-time": 1609902000000,
+                "planned-duration": null,
+                "planned-work-time": 37800000,
+                "start-time": null,
+                "end-time": null,
+                "work-time": 0,
+                "task-type": {
+                  "type": "TaskType",
+                  "id": "262200-02-1-210",
+                  "label": "APU FIRE EXTINGUISHING",
+                  "scope": "AVIO",
+                  "acmodel": null,
+                  "area": "Cockpit",
+                  "mpdtask": null,
+                  "phase": "phase 1",
+                  "taskType": "Optional Check",
+                  "task-category": "task_card"
+                }
+              },
+              {
+                "type": "TaskPlan",
+                "id": 1641323673323,
+                "title": "291000-20-1-210\nMAIN/AUXILIARY POWER",
+                "resource": {
+                  "type": "MaintenanceGroup",
+                  "id": 1641323673351,
+                  "title": "MECH-ENG"
+                },
+                "duration": 7200000,
+                "planParts": [
+                  {
+                    "type": "SessionPlan",
+                    "id": 1641323673373,
+                    "title": null,
+                    "resource": {
+                      "type": "Mechanic",
+                      "id": 1641323673373,
+                      "title": "mechanic 1"
+                    },
+                    "duration": 3600000,
+                    "planned-start-time": null,
+                    "planned-end-time": null,
+                    "planned-duration": null,
+                    "planned-work-time": null,
+                    "start-time": 1609480800000,
+                    "end-time": 1609484400000,
+                    "work-time": 3600000
+                  },
+                  {
+                    "type": "SessionPlan",
+                    "id": 1641323673377,
+                    "title": null,
+                    "resource": {
+                      "type": "Mechanic",
+                      "id": 1641323673377,
+                      "title": "mechanic 2"
+                    },
+                    "duration": 7200000,
+                    "planned-start-time": null,
+                    "planned-end-time": null,
+                    "planned-duration": null,
+                    "planned-work-time": null,
+                    "start-time": 1609480800000,
+                    "end-time": 1609488000000,
+                    "work-time": 7200000
+                  }
+                ],
+                "planned-start-time": 1609480800000,
+                "planned-end-time": 1609653600000,
+                "planned-duration": null,
+                "planned-work-time": 37800000,
+                "start-time": 1609480800000,
+                "end-time": 1609567200000,
+                "work-time": 10800000,
+                "task-type": {
+                  "type": "TaskType",
+                  "id": "291000-20-1-210",
+                  "label": "MAIN/AUXILIARY POWER",
+                  "scope": "MECH-ENG",
+                  "acmodel": null,
+                  "area": "Cockpit",
+                  "mpdtask": null,
+                  "phase": "phase 1",
+                  "taskType": "Optional Check",
+                  "task-category": "task_card"
+                }
+              },
+              {
+                "type": "TaskPlan",
+                "id": 1641323673342,
+                "title": "213100-03-1-210\nCHECK OF OUTFLOW VALVE CLOSING IN DITCHING CONFIGURATION",
+                "resource": {
+                  "type": "MaintenanceGroup",
+                  "id": 1641323673365,
+                  "title": "INT"
+                },
+                "duration": null,
+                "planParts": [],
+                "planned-start-time": 1609662600000,
+                "planned-end-time": 1609662600000,
+                "planned-duration": null,
+                "planned-work-time": 37800000,
+                "start-time": null,
+                "end-time": null,
+                "work-time": 0,
+                "task-type": {
+                  "type": "TaskType",
+                  "id": "213100-03-1-210",
+                  "label": "CHECK OF OUTFLOW VALVE CLOSING IN DITCHING CONFIGURATION",
+                  "scope": "INT",
+                  "acmodel": null,
+                  "area": "Cockpit",
+                  "mpdtask": null,
+                  "phase": "phase 1",
+                  "taskType": "Optional Check",
+                  "task-category": "task_card"
+                }
+              }
+            ],
+            "planned-start-time": 1609480800000,
+            "planned-end-time": 1609967100000,
+            "planned-duration": 486300000,
+            "planned-work-time": 151200000,
+            "start-time": 1609480800000,
+            "end-time": 1609567200000,
+            "work-time": 10800000
+          }
+        ],
+        "planned-start-time": 1609480800000,
+        "planned-end-time": 1609967100000,
+        "planned-duration": 486300000,
+        "planned-work-time": 236999999,
+        "start-time": 1609480800000,
+        "end-time": 1609567200000,
+        "work-time": 39600000
+      },
+      {
+        "type": "PhasePlan",
+        "id": 1641323673432,
+        "title": "-",
+        "resource": {
+          "type": "Aircraft",
+          "id": 1641323673422,
+          "title": "aircraft 111"
+        },
+        "duration": 86400000,
+        "planParts": [
+          {
+            "type": "GeneralTaskPlan",
+            "id": 1641323673464,
+            "title": "-",
+            "resource": {
+              "type": "AircraftArea",
+              "id": 1641323673462,
+              "title": "-"
+            },
+            "duration": 86400000,
+            "planParts": [
+              {
+                "type": "TaskPlan",
+                "id": 1641323673337,
+                "title": "499100-B4-1-300\nSTORAGE AND DISTRIBUTION",
+                "resource": {
+                  "type": "MaintenanceGroup",
+                  "id": 1641323673362,
+                  "title": "-"
+                },
+                "duration": null,
+                "planParts": [],
+                "planned-start-time": 1609653600000,
+                "planned-end-time": 1609869600000,
+                "planned-duration": null,
+                "planned-work-time": 7836000,
+                "start-time": null,
+                "end-time": null,
+                "work-time": 0,
+                "task-type": {
+                  "type": "TaskType",
+                  "id": "499100-B4-1-300",
+                  "label": "STORAGE AND DISTRIBUTION",
+                  "scope": "-",
+                  "acmodel": null,
+                  "area": "-",
+                  "mpdtask": null,
+                  "phase": "-",
+                  "taskType": "-",
+                  "task-category": "maintenance_wo"
+                }
+              }
+            ],
+            "planned-start-time": 1609653600000,
+            "planned-end-time": 1609869600000,
+            "planned-duration": 216000000,
+            "planned-work-time": 7836000,
+            "start-time": 1609480800000,
+            "end-time": 1609567200000,
+            "work-time": 0
+          }
+        ],
+        "planned-start-time": 1609653600000,
+        "planned-end-time": 1609869600000,
+        "planned-duration": 216000000,
+        "planned-work-time": 7836000,
+        "start-time": 1609480800000,
+        "end-time": 1609567200000,
+        "work-time": 0
+      }
+    ],
+    "planned-start-time": 1609480800000,
+    "planned-end-time": 1609967100000,
+    "planned-duration": 486300000,
+    "planned-work-time": 262835999,
+    "start-time": 1609480800000,
+    "end-time": 1609567200000,
+    "work-time": 52200000
+  }
+]
