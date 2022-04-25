@@ -1,7 +1,6 @@
-# Getting Started with Create React App
+# REACT-MAINTENANCE-PLANNER
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
+[![Netlify Status](https://api.netlify.com/api/v1/badges/3169f575-1d8c-4b1d-a8b7-b229dea0f5ef/deploy-status)](https://app.netlify.com/sites/react-maintenance-planner/deploys)
 ## Available Scripts
 
 In the project directory, you can run:
