@@ -4,11 +4,11 @@ import moment from "moment"
 import Timeline, {
   TodayMarker
 } from "./timeline"
-import InfoLabel from "./InfoLabel"
 import './timeline/lib/Timeline.css'
 import Xarrow from "react-xarrows"
 import './../assets/PlanningTool.css'
-import PropTypes from "prop-types";
+import PropTypes from "prop-types"
+import Popup from './Popup'
 
 
 const keys = {
@@ -29,12 +29,30 @@ class PlanningTool extends Component {
   constructor(props) {
     super(props)
 
-    const data = props.data
+    /*const data = require('../data3.json')
     const items = []
     const groupsMap = new Map()
-    this.buildData(data, groupsMap, items, 0, null)
 
-    let groups = Array.from(groupsMap, ([key, values]) => values)
+    this.buildData(data, groupsMap, [], 0, null)
+    let groups = Array.from(groupsMap, ([key, values]) => values)*/
+
+    let items = props.items || []
+    let groups = props.groups || []
+
+    for (const item of items) {
+      item.parent = item.parent ?? null
+      item.className = item.className ?? 'item'
+      item.bgColor = item.bgColor ?? '#2196F3'
+      item.color = item.color ?? '#fff'
+      item.selectedBgColor = item.selectedBgColor ?? '#FFC107'
+      item.selectedColor = item.selectedColor ?? '#000'
+      item.draggingBgColor = item.draggingBgColor ?? '#f00'
+      item.highlightBgColor = item.highlightBgColor ?? '#FFA500'
+      item.highlight = item.highlight ?? false
+      item.canMove = item.canMove ?? true
+      item.canResize = item.canResize ?? 'both'
+      item.minimumDuration = item.minimumDuration ?? false
+    }
 
     groups = groups.sort((a, b) => a.level - b.level).reduce((accumulator, currentValue) => {
       let item = accumulator.find(x => x.id === currentValue.parent)
@@ -57,6 +75,7 @@ class PlanningTool extends Component {
     const popup = {
       open: false,
       item: null,
+      custom: props.popup ?? false,
     }
 
     this.state = {
@@ -97,7 +116,6 @@ class PlanningTool extends Component {
         groupsMap.set(resourceId, {
           id: groupsMap.size,
           title: item.resource ? item.resource.title : '',
-          rightTitle: 'right title',
           hasChildren: item.planParts && item.planParts.length > 0,
           parent: groupParentId,
           open: level < 1,
@@ -117,11 +135,17 @@ class PlanningTool extends Component {
         start: date,
         end: endDate,
         parent: itemParentId,
-        className: 'className',
+        className: 'item',
         bgColor: this.getTaskBackground(item),
         color: '#fff',
         selectedBgColor: '#FFC107',
-        highlight: false
+        selectedColor: '#000',
+        draggingBgColor: '#f00',
+        highlightBgColor: '#FFA500',
+        highlight: false,
+        canMove: (level > 1 && level !== 3),
+        canResize: "both", //'left','right','both', false
+        minimumDuration: false,
       })
 
       if (item.planParts && item.planParts.length > 0) {
@@ -152,17 +176,69 @@ class PlanningTool extends Component {
   handleItemResize = (itemId, time, edge) => {
     const {items} = this.state
 
+    const item = items.find(item => item.id === itemId)
+    let start = moment(edge === "left" ? time : item.start)
+    let end = moment(edge === "left" ? item.end : time)
+
+    if (this.isLessThanMinimumDuration(item, start, end)) {
+      if (edge === 'left') {
+        start = end.clone().subtract(item.minimumDuration, 'minute')
+      } else {
+        end = start.clone().add(item.minimumDuration, 'minute')
+      }
+    }
+
+    item.start = start
+    item.end = end
+
     this.setState({
-      items: items.map(item =>
-        item.id === itemId
-          ? Object.assign({}, item, {
-            start: moment(edge === "left" ? time : item.start),
-            end: moment(edge === "left" ? item.end : time)
-          })
-          : item
-      ),
+      items: items,
       draggedItem: undefined
     })
+  }
+
+  handleItemDrag = ({eventType, itemId, time, edge, newGroupOrder}) => {
+    let item = this.state.draggedItem ? this.state.draggedItem.item : undefined
+    if (!item) {
+      item = this.state.items.find(i => i.id === itemId)
+    }
+
+    if (eventType === 'resize') {
+      let start = item.start
+      let end = item.end
+      if (edge === 'left') {
+        start = moment(time)
+      } else {
+        end = moment(time)
+      }
+
+      if (this.isLessThanMinimumDuration(item, start, end)) {
+        if (edge === 'left') {
+          time = end.clone().subtract(item.minimumDuration, 'minute')
+        } else {
+          time = start.clone().add(item.minimumDuration, 'minute')
+        }
+      }
+    }
+
+    const group = this.state.groups.filter(g => g.show)[newGroupOrder]
+    this.setState({
+      draggedItem: {item: item, group: group, time}
+    })
+
+    this.showItemInfo(item, group, {
+      type: eventType,
+      side: edge,
+      time: time,
+    })
+  }
+
+  isLessThanMinimumDuration = (item, start, end) => {
+    if (!item.minimumDuration) {
+      return false
+    }
+
+    return moment.duration(end.diff(start)).asMinutes() < item.minimumDuration
   }
 
   closeChildren = (groups, id) => {
@@ -213,64 +289,7 @@ class PlanningTool extends Component {
     }
   }
 
-  itemRenderer = ({item, timelineContext, itemContext, getItemProps, getResizeProps}) => {
-    const {left: leftResizeProps, right: rightResizeProps} = getResizeProps()
-    let backgroundColor = itemContext.selected ? (itemContext.dragging ? "red" : item.selectedBgColor) : item.bgColor
-    if (item.highlight) {
-      backgroundColor = '#FFA500'
-    }
-
-    return (
-      <div
-        {...getItemProps({
-          style: {
-            background: backgroundColor,
-            color: item.color,
-          },
-          onMouseDown: () => {
-            item.selected = true
-            this.removeHighlight()
-            this.highlightChildren(item)
-            this.showItemInfo(this.state.items.find(i => i.id === item.id))
-            this.setState({
-              items: this.state.items
-            })
-          },
-
-        })}
-        id={'item-' + item.id}
-      >
-        {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : null}
-
-        <div
-          style={{
-            height: itemContext.dimensions.height,
-            overflow: "hidden",
-            paddingLeft: 3,
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap"
-          }}
-        >
-          {itemContext.title}
-        </div>
-
-        {item.dependency ?
-          <Xarrow
-            start={'item-' + item.dependency}
-            end={'item-' + item.id}
-            strokeWidth={2}
-            headSize={6}
-          />
-          :
-          ''
-        }
-
-        {itemContext.useResizeHandle ? <div {...rightResizeProps} /> : null}
-      </div>
-    )
-  }
-
-  itemDeselected = (item) => {
+  itemDeselected = () => {
     this.removeHighlight()
 
     this.setState({
@@ -281,24 +300,37 @@ class PlanningTool extends Component {
     })
   }
 
-  handleItemDrag = ({eventType, itemId, time, edge, newGroupOrder}) => {
-    let item = this.state.draggedItem ? this.state.draggedItem.item : undefined
-    if (!item) {
-      item = this.state.items.find(i => i.id === itemId)
-    }
-    this.setState({
-      draggedItem: {item: item, group: this.state.groups.filter(g => g.show)[newGroupOrder], time}
-    })
-  }
-
-  showItemInfo = (item) => {
+  showItemInfo = (item, group, time) => {
     if (!item) {
       return
     }
+
+    let start = item.start
+    let end = item.end
+
+    if (time) {
+      if (time.type === 'resize') {
+        if (time.side === 'left') {
+          start = time.time
+        } else {
+          end = time.time
+        }
+      } else if (time.type === 'move') {
+        end = time.time + (item.end - item.start)
+        start = time.time
+      }
+    }
+
     this.setState({
       popup: {
         open: true,
-        item: item,
+        item: {
+          ...item,
+          start: start,
+          end: end,
+        },
+        group: group ?? this.state.groups.find(i => i.id === item.group),
+        custom: this.state.popup.custom,
       }
     })
   }
@@ -339,8 +371,82 @@ class PlanningTool extends Component {
     })
   }
 
+  itemRenderer = ({item, timelineContext, itemContext, getItemProps, getResizeProps}) => {
+    const {left: leftResizeProps, right: rightResizeProps} = getResizeProps()
+    let backgroundColor = item.bgColor ?? '#2196F3'
+    let color = item.color ?? '#fff'
+
+    if (itemContext.selected) {
+      color = item.selectedColor
+      if (itemContext.dragging) {
+        backgroundColor = item.draggingBgColor
+      } else {
+        backgroundColor = item.selectedBgColor
+      }
+    } else if (item.highlight) {
+      backgroundColor = item.highlightBgColor
+    }
+
+    if (itemContext.dimensions.width < 20) {
+      itemContext.dimensions.width = 20
+    }
+
+    return (
+      <div
+        {...getItemProps({
+          style: {
+            background: backgroundColor,
+            color: color,
+            minWidth: 20,
+          },
+          onMouseDown: () => {
+            item.selected = true
+            this.removeHighlight()
+            this.highlightChildren(item)
+            this.showItemInfo(this.state.items.find(i => i.id === item.id))
+            this.setState({
+              items: this.state.items
+            })
+          },
+
+        })}
+        id={'item-' + item.id}
+        className={item.canMove ? 'movable-item' : 'static-item'}
+      >
+        {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : null}
+
+        <div
+          style={{
+            height: itemContext.dimensions.height,
+            overflow: "hidden",
+            paddingLeft: 3,
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            zIndex: '100',
+            position: 'relative',
+          }}
+        >
+          {itemContext.title}
+        </div>
+
+        {item.dependency ?
+          <Xarrow
+            start={'item-' + item.dependency}
+            end={'item-' + item.id}
+            strokeWidth={2}
+            headSize={6}
+          />
+          :
+          ''
+        }
+
+        {itemContext.useResizeHandle ? <div {...rightResizeProps} /> : null}
+      </div>
+    )
+  }
+
   render() {
-    const {groups, items, defaultTimeStart, defaultTimeEnd, sidebarWidth, popup, draggedItem} = this.state
+    const {groups, items, defaultTimeStart, defaultTimeEnd, sidebarWidth, popup} = this.state
 
     const newGroups = groups.filter((g) => g.show).map((group) => {
       return Object.assign({}, group, {
@@ -385,30 +491,17 @@ class PlanningTool extends Component {
           <TodayMarker interval={1000}/>
         </Timeline>
 
-        {draggedItem && (
-          <InfoLabel
-            item={draggedItem.item}
-            group={draggedItem.group}
-            time={draggedItem.time}
-          />
-        )}
-
         {popup.open && (
-          <div className="popup">
-            <div className="popup-body">
-              <h3>{popup.item.title}</h3>
-              <div className="dates">
-                <h4>Date</h4>
-                <span className="date date-from">
-                  From: {popup.item.start.format('LLL')}
-                </span>
-                <br/>
-                <span className="date date-to">
-                  To: {popup.item.end.format('LLL')}
-                </span>
-              </div>
-            </div>
-          </div>
+          popup.custom ?
+            popup.custom({
+              item: popup.item,
+              group: popup.group,
+            })
+            :
+            <Popup
+              item={popup.item}
+              group={popup.group}
+            />
         )}
 
         <div className="explanatory-notes">
@@ -431,10 +524,57 @@ class PlanningTool extends Component {
   }
 }
 
-PlanningTool.defaultProps = {
-  data: require('./../data3.json')
-}
+
 PlanningTool.propTypes = {
-  data: PropTypes.array,
+  items: PropTypes.arrayOf(PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      group: PropTypes.number.isRequired,
+      title: PropTypes.string,
+      start: PropTypes.instanceOf(moment).isRequired,
+      end: PropTypes.instanceOf(moment).isRequired,
+      parent: PropTypes.number,
+      className: PropTypes.string,
+      bgColor: PropTypes.string,
+      color: PropTypes.string,
+      selectedBgColor: PropTypes.string,
+      selectedColor: PropTypes.string,
+      draggingBgColor: PropTypes.string,
+      highlightBgColor: PropTypes.string,
+      highlight: PropTypes.bool,
+      canMove: PropTypes.bool,
+      canResize: PropTypes.oneOf(['both', 'left', 'right', false]),
+      minimumDuration: PropTypes.oneOf([PropTypes.number, false]),
+    }
+  )).isRequired,
+  groups: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    title: PropTypes.string.isRequired,
+    hasChildren: PropTypes.bool.isRequired,
+    parent: PropTypes.number.isRequired,
+    open: PropTypes.bool.isRequired,
+    show: PropTypes.bool.isRequired,
+    level: PropTypes.number.isRequired,
+  })).isRequired,
+  popup: PropTypes.elementType,
+}
+
+PlanningTool.defaultProps = {
+  items: [
+    {
+      parent: null,
+      className: 'item',
+      bgColor: '#2196F3',
+      color: '#fff',
+      selectedBgColor: '#FFC107',
+      selectedColor: '#000',
+      draggingBgColor: '#f00',
+      highlightBgColor: '#FFA500',
+      highlight: false,
+      canMove: true,
+      canResize: 'both',
+      minimumDuration: false,
+    }
+  ],
+  popup: Popup
 }
 export default PlanningTool

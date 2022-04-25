@@ -164,7 +164,7 @@ export default class ReactCalendarTimeline extends Component {
   static defaultProps = {
     sidebarWidth: 150,
     rightSidebarWidth: 0,
-    dragSnap: 1000 * 60 * 15, // 15min
+    dragSnap: 1000 * 60, // 1min
     minResizeWidth: 20,
     stickyHeader: true,
     lineHeight: 30,
@@ -607,6 +607,7 @@ export default class ReactCalendarTimeline extends Component {
         this.props.onItemClick(item, e, time)
       }
     } else {
+      //TODO: multiple select
       this.setState({selectedItem: item})
       if (item && this.props.onItemSelect) {
         const time = this.timeFromItemEvent(e)
