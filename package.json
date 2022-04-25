@@ -33,7 +33,7 @@
     "build:lib": "microbundle -jsx React.createElement --jsxFragment React.Fragment --jsxImportSource react",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "build-static-webapp":"expo build:web"
+    "build-static-webapp": "expo build:web"
   },
   "eslintConfig": {
     "extends": [
