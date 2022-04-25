@@ -40,18 +40,18 @@ class PlanningTool extends Component {
     let groups = props.groups || []
 
     for (const item of items) {
-      item.parent = item.parent ?? null
-      item.className = item.className ?? 'item'
-      item.bgColor = item.bgColor ?? '#2196F3'
-      item.color = item.color ?? '#fff'
-      item.selectedBgColor = item.selectedBgColor ?? '#FFC107'
-      item.selectedColor = item.selectedColor ?? '#000'
-      item.draggingBgColor = item.draggingBgColor ?? '#f00'
-      item.highlightBgColor = item.highlightBgColor ?? '#FFA500'
-      item.highlight = item.highlight ?? false
-      item.canMove = item.canMove ?? true
-      item.canResize = item.canResize ?? 'both'
-      item.minimumDuration = item.minimumDuration ?? false
+      item.parent = item.parent != null ? item.parent : null
+      item.className = item.className != null ? item.className : 'item'
+      item.bgColor = item.bgColor != null ? item.bgColor : '#2196F3'
+      item.color = item.color != null ? item.color : '#fff'
+      item.selectedBgColor = item.selectedBgColor != null ? item.selectedBgColor : '#FFC107'
+      item.selectedColor = item.selectedColor != null ? item.selectedColor : '#000'
+      item.draggingBgColor = item.draggingBgColor != null ? item.draggingBgColor : '#f00'
+      item.highlightBgColor = item.highlightBgColor != null ? item.highlightBgColor : '#FFA500'
+      item.highlight = item.highlight != null ? item.highlight : false
+      item.canMove = item.canMove != null ? item.canMove : true
+      item.canResize = item.canResize != null ? item.canResize : 'both'
+      item.minimumDuration = item.minimumDuration != null ? item.minimumDuration : false
     }
 
     groups = groups.sort((a, b) => a.level - b.level).reduce((accumulator, currentValue) => {
@@ -75,7 +75,7 @@ class PlanningTool extends Component {
     const popup = {
       open: false,
       item: null,
-      custom: props.popup ?? false,
+      custom: props.popup != null ? props.popup : false,
     }
 
     this.state = {
@@ -329,7 +329,7 @@ class PlanningTool extends Component {
           start: start,
           end: end,
         },
-        group: group ?? this.state.groups.find(i => i.id === item.group),
+        group: group != null ? group : this.state.groups.find(i => i.id === item.group),
         custom: this.state.popup.custom,
       }
     })
@@ -373,8 +373,8 @@ class PlanningTool extends Component {
 
   itemRenderer = ({item, timelineContext, itemContext, getItemProps, getResizeProps}) => {
     const {left: leftResizeProps, right: rightResizeProps} = getResizeProps()
-    let backgroundColor = item.bgColor ?? '#2196F3'
-    let color = item.color ?? '#fff'
+    let backgroundColor = item.bgColor
+    let color = item.color
 
     if (itemContext.selected) {
       color = item.selectedColor
@@ -413,7 +413,16 @@ class PlanningTool extends Component {
         id={'item-' + item.id}
         className={item.canMove ? 'movable-item' : 'static-item'}
       >
-        {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : null}
+        {itemContext.selected ?
+          itemContext.useResizeHandle ? <div {...leftResizeProps}/> : <span style={{
+            cursor: 'ew-resize',
+            width: 3,
+            zIndex: 1000,
+            position: 'absolute',
+            top: 0,
+            left: -3,
+            height: '100%'
+          }}/> : ''}
 
         <div
           style={{
@@ -440,7 +449,16 @@ class PlanningTool extends Component {
           ''
         }
 
-        {itemContext.useResizeHandle ? <div {...rightResizeProps} /> : null}
+        {itemContext.selected ?
+          itemContext.useResizeHandle ? <div {...rightResizeProps}/> : <span style={{
+            cursor: 'ew-resize',
+            width: 3,
+            zIndex: 1000,
+            position: 'absolute',
+            top: 0,
+            right: -3,
+            height: '100%',
+          }}/> : ''}
       </div>
     )
   }
@@ -549,8 +567,8 @@ PlanningTool.propTypes = {
   groups: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.number.isRequired,
     title: PropTypes.string.isRequired,
-    hasChildren: PropTypes.bool.isRequired,
-    parent: PropTypes.number.isRequired,
+    hasChildren: PropTypes.bool,
+    parent: PropTypes.number,
     open: PropTypes.bool.isRequired,
     show: PropTypes.bool.isRequired,
     level: PropTypes.number.isRequired,
