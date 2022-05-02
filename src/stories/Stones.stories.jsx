@@ -4,7 +4,7 @@ import moment from 'moment'
 
 export default {
   component: PlanningTool,
-  title: 'Planning tool',
+  title: 'Milestones',
   parameters: {
     actions: {
       handles: ['click .rct-item'],
@@ -817,10 +817,24 @@ const items = [
   }
 ]
 
-const Template = (args) => <PlanningTool {...args} />
+const MilestonesTemplate = (args) => <PlanningTool {...args} />
 
-export const _default = Template.bind({})
-_default.args = {
+export const milestones = MilestonesTemplate.bind({})
+
+const milestonesItems = [
+  {
+    date: moment("2022-03-29T05:00:00.000Z"),
+    label: 'Milestone 1',
+  },
+  {
+    date: moment("2022-03-31T05:30:00.000Z"),
+    label: 'Milestone 2',
+    color: '#f00',
+  },
+]
+
+milestones.args = {
   groups: groups,
   items: items,
+  milestones: milestonesItems,
 }

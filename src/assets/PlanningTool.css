@@ -64,8 +64,8 @@
   position: absolute;
   background: repeating-linear-gradient(
     -45deg,
-    rgba(0,0,0,0),
-    rgba(0,0,0,0) 10px,
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 0) 10px,
     #465298 10px,
     #465298 20px
   );
@@ -74,4 +74,49 @@
   left: 0;
   top: 0;
   opacity: .3;
+}
+
+.milestone:hover .milestone-label {
+  display: inline-block;
+}
+
+.milestone-label {
+  display: none;
+  width: 150px;
+  background-color: rgba(0, 0, 0, .7);
+  position: absolute;
+  top: 10%;
+  left: 3px;
+  color: #fff;
+  padding: 5px;
+  font-family: "Roboto", sans-serif;
+}
+
+.milestone-date {
+  font-size: 12px;
+}
+
+.undo-button {
+  display: inline-block;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #333;
+  color: #333;
+  font-family: "Roboto", sans-serif;
+  font-size: 18px;
+  transition-duration: .5s;
+  margin-top: 25px;
+  cursor:pointer;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
+.undo-button:hover {
+  background-color: #333;
+  color: #fff;
 }

@@ -2,14 +2,14 @@ import React, {Component} from "react"
 import moment from "moment"
 
 import Timeline, {
-  TodayMarker
+  TodayMarker,
+  CustomMarker,
 } from "./timeline"
 import './timeline/lib/Timeline.css'
 import Xarrow from "react-xarrows"
 import './../assets/PlanningTool.css'
 import PropTypes from "prop-types"
 import Popup from './Popup'
-
 
 const keys = {
   groupIdKey: "id",
@@ -29,12 +29,7 @@ class PlanningTool extends Component {
   constructor(props) {
     super(props)
 
-    /*const data = require('../data3.json')
-    const items = []
-    const groupsMap = new Map()
-
-    this.buildData(data, groupsMap, [], 0, null)
-    let groups = Array.from(groupsMap, ([key, values]) => values)*/
+    this.actions = []
 
     let items = props.items || []
     let groups = props.groups || []
@@ -63,10 +58,6 @@ class PlanningTool extends Component {
       return accumulator
     }, [])
 
-    if (items.length > 0) {
-      items.find(i => i.id === 4).dependency = 3
-      items.find(i => i.id === 5).dependency = 3
-    }
     const defaultTimeStart = items.length > 0 ? moment(items[0].start).add(-12, 'hour') : moment()
     const defaultTimeEnd = defaultTimeStart.clone().add(7, 'day')
 
@@ -78,6 +69,11 @@ class PlanningTool extends Component {
       custom: props.popup != null ? props.popup : false,
     }
 
+    let milestones = []
+    if (props.milestones) {
+      milestones = props.milestones
+    }
+
     this.state = {
       groups,
       items,
@@ -86,6 +82,7 @@ class PlanningTool extends Component {
       sidebarWidth,
       sidebarResizing,
       popup,
+      milestones,
     }
   }
 
@@ -159,6 +156,8 @@ class PlanningTool extends Component {
 
     const group = groups.filter(g => g.show)[newGroupOrder]
 
+    this.actions.push(items.find(i => i.id === itemId))
+
     this.setState({
       items: items.map(item =>
         item.id === itemId
@@ -177,6 +176,9 @@ class PlanningTool extends Component {
     const {items} = this.state
 
     const item = items.find(item => item.id === itemId)
+
+    this.actions.push(Object.assign({}, item))
+
     let start = moment(edge === "left" ? time : item.start)
     let end = moment(edge === "left" ? item.end : time)
 
@@ -371,6 +373,24 @@ class PlanningTool extends Component {
     })
   }
 
+  undo = () => {
+    if (this.actions.length <= 0) {
+      return
+    }
+    const {items} = this.state
+
+    const undoItem = this.actions.pop()
+
+    this.setState({
+      items: items.map(item =>
+        item.id === undoItem.id
+          ? Object.assign({}, undoItem)
+          : item
+      ),
+      draggedItem: undefined
+    })
+  }
+
   itemRenderer = ({item, timelineContext, itemContext, getItemProps, getResizeProps}) => {
     const {left: leftResizeProps, right: rightResizeProps} = getResizeProps()
     let backgroundColor = item.bgColor
@@ -464,7 +484,7 @@ class PlanningTool extends Component {
   }
 
   render() {
-    const {groups, items, defaultTimeStart, defaultTimeEnd, sidebarWidth, popup} = this.state
+    const {groups, items, defaultTimeStart, defaultTimeEnd, sidebarWidth, popup, milestones} = this.state
 
     const newGroups = groups.filter((g) => g.show).map((group) => {
       return Object.assign({}, group, {
@@ -507,7 +527,38 @@ class PlanningTool extends Component {
           }}
         >
           <TodayMarker interval={1000}/>
+          {milestones.length > 0 ?
+            milestones.map((milestone, i) =>
+              <CustomMarker date={milestone.date.valueOf()} key={'marker-' + i}>
+                {({styles, date}) => {
+                  const customStyles = {
+                    ...styles,
+                    backgroundColor: milestone.color ? milestone.color : '#000',
+                    width: '3px',
+                    pointerEvents: 'auto',
+                    zIndex: 1000,
+                  }
+
+                  return <div
+                    style={customStyles}
+                    className={'milestone'}
+                  >
+                    <span className="milestone-label">
+                      {milestone.label ? milestone.label : ''}<br/>
+                      <span className="milestone-date">{milestone.date.format('LLL')}</span>
+                    </span>
+                  </div>
+                }}
+              </CustomMarker>
+            )
+            :
+            ''
+          }
         </Timeline>
+
+        <div className="undo-button" onClick={this.undo}>
+          Undo
+        </div>
 
         {popup.open && (
           popup.custom ?
@@ -574,6 +625,11 @@ PlanningTool.propTypes = {
     level: PropTypes.number.isRequired,
   })).isRequired,
   popup: PropTypes.elementType,
+  milestones: PropTypes.arrayOf(PropTypes.shape({
+    date: PropTypes.instanceOf(moment).isRequired,
+    label: PropTypes.string,
+    color: PropTypes.string,
+  }))
 }
 
 PlanningTool.defaultProps = {
@@ -593,6 +649,6 @@ PlanningTool.defaultProps = {
       minimumDuration: false,
     }
   ],
-  popup: Popup
+  popup: Popup,
 }
 export default PlanningTool
