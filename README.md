@@ -1,6 +1,9 @@
 # REACT-MAINTENANCE-PLANNER
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/3169f575-1d8c-4b1d-a8b7-b229dea0f5ef/deploy-status)](https://app.netlify.com/sites/react-maintenance-planner/deploys)
+## Live demo
+[Live demo](https://react-maintenance-planner.netlify.app/)
+
 ## Available Scripts
 
 In the project directory, you can run:
