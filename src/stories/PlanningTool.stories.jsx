@@ -668,7 +668,7 @@ const items = [
     "group": 19,
     "title": "262200-02-1-210\nAPU FIRE EXTINGUISHING",
     "start": moment("2022-03-31T14:00:00.000Z"),
-    "end": moment("2022-04-02T02:00:00.000Z"),
+    "end": moment("2022-04-02T04:00:00.000Z"),
     "parent": 22,
     "className": "item",
     "bgColor": "#00aa00",
