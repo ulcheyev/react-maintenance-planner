@@ -433,7 +433,7 @@ class PlanningTool extends Component {
         id={'item-' + item.id}
         className={item.canMove ? 'movable-item' : 'static-item'}
       >
-        {itemContext.selected ?
+        {itemContext.selected && (item.canResize === 'both' || item.canResize === 'left') ?
           itemContext.useResizeHandle ? <div {...leftResizeProps}/> : <span style={{
             cursor: 'ew-resize',
             width: 3,
@@ -469,7 +469,7 @@ class PlanningTool extends Component {
           ''
         }
 
-        {itemContext.selected ?
+        {itemContext.selected && (item.canResize === 'both' || item.canResize === 'right') ?
           itemContext.useResizeHandle ? <div {...rightResizeProps}/> : <span style={{
             cursor: 'ew-resize',
             width: 3,

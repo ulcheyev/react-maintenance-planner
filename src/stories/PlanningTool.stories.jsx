@@ -394,7 +394,7 @@ const items = [
     "highlightBgColor": "#FFA500",
     "highlight": false,
     "canMove": false,
-    "canResize": "both",
+    "canResize": "right",
     "minimumDuration": false
   },
   {
