@@ -237,7 +237,7 @@ const items = [
     "end": moment("2022-04-02T20:05:00.000Z"),
     "highlight": false,
     "canMove": false,
-    "canResize": "both",
+    "canResize": "right",
     "minimumDuration": false
   },
   {
@@ -255,7 +255,7 @@ const items = [
     "draggingBgColor": "#f00",
     "highlightBgColor": "#FFA500",
     "highlight": false,
-    "canMove": false,
+    "canMove": true,
     "canResize": "both",
     "minimumDuration": false
   },
@@ -801,6 +801,25 @@ const items = [
     "group": 24,
     "title": "499100-B4-1-300\nSTORAGE AND DISTRIBUTION",
     "start": moment("2022-03-30T05:00:00.000Z"),
+    "end": moment("2022-04-01T17:00:00.000Z"),
+    "parent": 30,
+    "className": "item",
+    "bgColor": "#0000aa",
+    "color": "#fff",
+    "selectedBgColor": "#FFC107",
+    "selectedColor": "#000",
+    "draggingBgColor": "#f00",
+    "highlightBgColor": "#FFA500",
+    "highlight": false,
+    "canMove": false,
+    "canResize": "both",
+    "minimumDuration": false
+  },
+  {
+    "id": 32,
+    "group": 19,
+    "title": "Test item",
+    "start": moment("2022-04-30T05:00:00.000Z"),
     "end": moment("2022-04-01T17:00:00.000Z"),
     "parent": 30,
     "className": "item",
