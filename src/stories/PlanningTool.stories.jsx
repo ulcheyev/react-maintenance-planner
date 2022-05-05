@@ -298,7 +298,6 @@ const items = [
     "canMove": false,
     "canResize": "both",
     "minimumDuration": false,
-    "dependency": 3,
     "selected": true
   },
   {
@@ -319,7 +318,6 @@ const items = [
     "canMove": true,
     "canResize": "both",
     "minimumDuration": false,
-    "dependency": 3,
     "selected": true
   },
   {
