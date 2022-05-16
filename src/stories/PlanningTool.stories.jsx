@@ -641,7 +641,8 @@ const items = [
     "highlight": false,
     "canMove": true,
     "canResize": "both",
-    "minimumDuration": false
+    "minimumDuration": false,
+    "maximumDuration": 120
   },
   {
     "id": 23,

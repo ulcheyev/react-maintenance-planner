@@ -48,6 +48,7 @@ class PlanningTool extends Component {
       item.canMove = item.canMove != null ? item.canMove : true
       item.canResize = item.canResize != null ? item.canResize : 'both'
       item.minimumDuration = item.minimumDuration != null ? item.minimumDuration : false
+      item.maximumDuration = item.maximumDuration != null ? item.maximumDuration : false
     }
 
     groups = groups.sort((a, b) => a.level - b.level).reduce((accumulator, currentValue) => {
@@ -191,6 +192,12 @@ class PlanningTool extends Component {
       } else {
         end = start.clone().add(item.minimumDuration, 'minute')
       }
+    }else if(this.isMoreThanMaximumDuration(item,start,end)){
+      if (edge === 'left') {
+        start = end.clone().subtract(item.maximumDuration, 'minute')
+      } else {
+        end = start.clone().add(item.maximumDuration, 'minute')
+      }
     }
 
     item.start = start
@@ -244,6 +251,14 @@ class PlanningTool extends Component {
     }
 
     return moment.duration(end.diff(start)).asMinutes() < item.minimumDuration
+  }
+
+  isMoreThanMaximumDuration = (item, start, end) => {
+    if (!item.maximumDuration) {
+      return false
+    }
+
+    return moment.duration(end.diff(start)).asMinutes() > item.maximumDuration
   }
 
   toggleGroup = (id) => {
@@ -688,7 +703,8 @@ PlanningTool.propTypes = {
       highlight: PropTypes.bool,
       canMove: PropTypes.bool,
       canResize: PropTypes.oneOf(['both', 'left', 'right', false]),
-      minimumDuration: PropTypes.oneOf([PropTypes.number, false]),
+      minimumDuration: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf([false])]),
+      maximumDuration: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf([false])]),
     }
   )).isRequired,
   groups: PropTypes.arrayOf(PropTypes.shape({
@@ -723,6 +739,7 @@ PlanningTool.defaultProps = {
       canMove: true,
       canResize: 'both',
       minimumDuration: false,
+      maximumDuration: false,
     }
   ],
   popup: Popup,
