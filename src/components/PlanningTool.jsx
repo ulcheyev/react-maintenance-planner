@@ -30,6 +30,7 @@ class PlanningTool extends Component {
     super(props)
 
     this.actions = []
+    this.redoActions = []
 
     let items = props.items || []
     let groups = props.groups || []
@@ -158,7 +159,7 @@ class PlanningTool extends Component {
 
     const group = groups.filter(g => g.show)[newGroupOrder]
 
-    this.actions.push(items.find(i => i.id === itemId))
+    this.addUndoItem(items.find(i => i.id === itemId))
 
     this.setState({
       items: items.map(item =>
@@ -179,7 +180,7 @@ class PlanningTool extends Component {
 
     const item = items.find(item => item.id === itemId)
 
-    this.actions.push(Object.assign({}, item))
+    this.addUndoItem(item)
 
     let start = moment(edge === "left" ? time : item.start)
     let end = moment(edge === "left" ? item.end : time)
@@ -375,6 +376,11 @@ class PlanningTool extends Component {
     })
   }
 
+  addUndoItem = (item) => {
+    this.redoActions = []
+    this.actions.push(Object.assign({}, item))
+  }
+
   undo = () => {
     if (this.actions.length <= 0) {
       return
@@ -382,6 +388,7 @@ class PlanningTool extends Component {
     const {items} = this.state
 
     const undoItem = this.actions.pop()
+    this.redoActions.push(items.find(i => i.id === undoItem.id))
 
     this.setState({
       items: items.map(item =>
@@ -393,7 +400,26 @@ class PlanningTool extends Component {
     })
   }
 
-  onTimeChange(visibleTimeStart, visibleTimeEnd, updateScrollCanvas, unit){
+  redo = () => {
+    if (this.redoActions.length <= 0) {
+      return
+    }
+    const {items} = this.state
+
+    const redoItem = this.redoActions.pop()
+    this.actions.push(items.find(i => i.id === redoItem.id))
+
+    this.setState({
+      items: items.map(item =>
+        item.id === redoItem.id
+          ? Object.assign({}, redoItem)
+          : item
+      ),
+      draggedItem: undefined
+    })
+  }
+
+  onTimeChange(visibleTimeStart, visibleTimeEnd, updateScrollCanvas, unit) {
     updateScrollCanvas(visibleTimeStart, visibleTimeEnd)
   }
 
@@ -409,11 +435,11 @@ class PlanningTool extends Component {
     items.shift()
 
     for (const item of items) {
-      if(dateStart.diff(item.start) > 0){
+      if (dateStart.diff(item.start) > 0) {
         dateStart = item.start.clone()
       }
 
-      if(dateEnd.diff(item.end) < 0){
+      if (dateEnd.diff(item.end) < 0) {
         dateEnd = item.end.clone()
       }
       item.highlight = true
@@ -596,9 +622,15 @@ class PlanningTool extends Component {
           }
         </Timeline>
 
-        <div className="undo-button" onClick={this.undo}>
-          Undo
+        <div className="action-buttons">
+          <button className={`action-button ${this.actions.length <= 0 ? 'disabled' : ''}`} onClick={this.undo}>
+            Undo
+          </button>
+          <button className={`action-button ${this.redoActions.length <= 0 ? 'disabled' : ''}`} onClick={this.redo}>
+            Redo
+          </button>
         </div>
+
 
         {/*<div onClick={() => this.focusItems(items.filter(item => (item.id === 8 || item.id === 10)))}>
           focus

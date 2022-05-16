@@ -96,7 +96,12 @@
   font-size: 12px;
 }
 
-.undo-button {
+.action-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.action-button {
   display: inline-block;
   padding: 10px;
   background-color: #fff;
@@ -106,17 +111,24 @@
   font-size: 18px;
   transition-duration: .5s;
   margin-top: 25px;
-  cursor:pointer;
+  cursor: pointer;
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
   -khtml-user-select: none; /* Konqueror HTML */
   -moz-user-select: none; /* Old versions of Firefox */
   -ms-user-select: none; /* Internet Explorer/Edge */
-  user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome, Edge, Opera and Firefox */
+  user-select: none;
+  /* Non-prefixed version, currently
+                                   supported by Chrome, Edge, Opera and Firefox */
 }
 
-.undo-button:hover {
+.action-button.disabled {
+  cursor: no-drop;
+  background-color: #c3c3c3 !important;
+  color: #333 !important;
+}
+
+.action-button:hover {
   background-color: #333;
   color: #fff;
 }
