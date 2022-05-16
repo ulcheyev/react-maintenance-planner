@@ -74,6 +74,8 @@ class PlanningTool extends Component {
       milestones = props.milestones
     }
 
+    this.timeline = React.createRef()
+
     this.state = {
       groups,
       items,
@@ -243,19 +245,6 @@ class PlanningTool extends Component {
     return moment.duration(end.diff(start)).asMinutes() < item.minimumDuration
   }
 
-  closeChildren = (groups, id) => {
-    groups.filter(g => g.parent === id).forEach((g) => {
-      g.show = false
-
-      if (g.hasChildren) {
-        g.open = false
-        groups = this.closeChildren(groups, g.id)
-      }
-    })
-
-    return groups
-  }
-
   toggleGroup = (id) => {
     let {groups} = this.state
 
@@ -274,6 +263,19 @@ class PlanningTool extends Component {
     this.setState({
       groups: groups
     })
+  }
+
+  closeChildren = (groups, id) => {
+    groups.filter(g => g.parent === id).forEach((g) => {
+      g.show = false
+
+      if (g.hasChildren) {
+        g.open = false
+        groups = this.closeChildren(groups, g.id)
+      }
+    })
+
+    return groups
   }
 
   highlightChildren = (item) => {
@@ -391,6 +393,37 @@ class PlanningTool extends Component {
     })
   }
 
+  onTimeChange(visibleTimeStart, visibleTimeEnd, updateScrollCanvas, unit){
+    updateScrollCanvas(visibleTimeStart, visibleTimeEnd)
+  }
+
+  focusItems = (items) => {
+    if (!items || !Array.isArray(items) || items.length <= 0) {
+      return
+    }
+
+    this.removeHighlight()
+    let dateStart = items[0].start.clone()
+    let dateEnd = items[0].end.clone()
+    items[0].highlight = true
+    items.shift()
+
+    for (const item of items) {
+      if(dateStart.diff(item.start) > 0){
+        dateStart = item.start.clone()
+      }
+
+      if(dateEnd.diff(item.end) < 0){
+        dateEnd = item.end.clone()
+      }
+      item.highlight = true
+    }
+
+    dateStart.subtract(1, 'hour')
+    dateEnd.add(2, 'hour')
+    this.timeline.current.updateScrollCanvas(dateStart.valueOf(), dateEnd.valueOf())
+  }
+
   itemRenderer = ({item, timelineContext, itemContext, getItemProps, getResizeProps}) => {
     const {left: leftResizeProps, right: rightResizeProps} = getResizeProps()
     let backgroundColor = item.bgColor
@@ -490,11 +523,16 @@ class PlanningTool extends Component {
       return Object.assign({}, group, {
         title: group.hasChildren ? (
           <div onClick={() => this.toggleGroup(group.id)}
-               style={{cursor: 'pointer', paddingLeft: group.level * 20}}>
+               style={{
+                 cursor: 'pointer',
+                 paddingLeft: group.level * 20
+               }}>
             {group.open ? '[-]' : '[+]'} {group.title}
           </div>
         ) : (
-          <div style={{paddingLeft: group.level * 20}}>{group.title}</div>
+          <div style={{paddingLeft: group.level * 20}}>
+            {group.title}
+          </div>
         )
       })
     })
@@ -502,6 +540,7 @@ class PlanningTool extends Component {
     return (
       <div>
         <Timeline
+          ref={this.timeline}
           groups={newGroups}
           items={items}
           keys={keys}
@@ -514,6 +553,7 @@ class PlanningTool extends Component {
           sidebarWidth={sidebarWidth}
           defaultTimeStart={defaultTimeStart}
           defaultTimeEnd={defaultTimeEnd}
+          onTimeChange={this.onTimeChange}
           itemRenderer={this.itemRenderer}
           onItemMove={this.handleItemMove}
           onItemResize={this.handleItemResize}
@@ -559,6 +599,10 @@ class PlanningTool extends Component {
         <div className="undo-button" onClick={this.undo}>
           Undo
         </div>
+
+        {/*<div onClick={() => this.focusItems(items.filter(item => (item.id === 8 || item.id === 10)))}>
+          focus
+        </div>*/}
 
         {popup.open && (
           popup.custom ?
