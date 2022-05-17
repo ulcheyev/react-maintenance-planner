@@ -742,12 +742,6 @@ PlanningTool.defaultProps = {
       maximumDuration: false,
     }
   ],
-  milestones: [
-    {
-      label: '',
-      color: '#000',
-    }
-  ],
   popup: Popup,
 }
 export default PlanningTool
