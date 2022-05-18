@@ -35,6 +35,13 @@ class PlanningTool extends Component {
     let items = props.items || []
     let groups = props.groups || []
 
+    if (!Array.isArray(items)) {
+      items = []
+    }
+    if (!Array.isArray(groups)) {
+      groups = []
+    }
+
     for (const item of items) {
       item.parent = item.parent != null ? item.parent : null
       item.className = item.className != null ? item.className : 'item'
