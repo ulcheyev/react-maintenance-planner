@@ -192,7 +192,7 @@ class PlanningTool extends Component {
       } else {
         end = start.clone().add(item.minimumDuration, 'minute')
       }
-    }else if(this.isMoreThanMaximumDuration(item,start,end)){
+    } else if (this.isMoreThanMaximumDuration(item, start, end)) {
       if (edge === 'left') {
         start = end.clone().subtract(item.maximumDuration, 'minute')
       } else {
@@ -742,6 +742,7 @@ PlanningTool.defaultProps = {
       maximumDuration: false,
     }
   ],
+  groups: [],
   popup: Popup,
 }
 export default PlanningTool
