@@ -1,4 +1,4 @@
-{
+/*{
   "plugins": [
     "react",
     "jest",
@@ -32,3 +32,4 @@
     "sourceType": "module"
   }
 }
+*/

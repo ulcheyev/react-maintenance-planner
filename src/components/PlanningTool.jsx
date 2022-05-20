@@ -4,8 +4,8 @@ import moment from "moment"
 import Timeline, {
   TodayMarker,
   CustomMarker,
-} from "./timeline"
-import './timeline/lib/Timeline.css'
+} from "./timeline/src"
+import './timeline/src/lib/Timeline.css'
 import Xarrow from "react-xarrows"
 import './../assets/PlanningTool.css'
 import PropTypes from "prop-types"
