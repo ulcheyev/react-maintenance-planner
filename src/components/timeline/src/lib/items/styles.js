@@ -18,13 +18,13 @@ export const selectedAndCanResizeLeft = {
   borderLeftWidth: 3
 }
 export const selectedAndCanResizeLeftAndDragLeft = {
-  cursor: 'w-resize'
+  cursor: 'ew-resize'
 }
 export const selectedAndCanResizeRight = {
   borderRightWidth: 3
 }
 export const selectedAndCanResizeRightAndDragRight = {
-  cursor: 'e-resize'
+  cursor: 'ew-resize'
 }
 
 export const leftResizeStyle = {
