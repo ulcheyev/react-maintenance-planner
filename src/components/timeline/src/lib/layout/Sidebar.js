@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 
-import { _get, arraysEqual } from '../utility/generic'
+import {_get, arraysEqual} from '../utility/generic'
 
 export default class Sidebar extends Component {
   static propTypes = {
@@ -12,15 +12,26 @@ export default class Sidebar extends Component {
     keys: PropTypes.object.isRequired,
     groupRenderer: PropTypes.func,
     isRightSidebar: PropTypes.bool,
+    handleSidebarResize: PropTypes.object,
   }
 
-  shouldComponentUpdate(nextProps) {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      width: props.width,
+      resizing: false,
+    }
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
     return !(
       nextProps.keys === this.props.keys &&
       nextProps.width === this.props.width &&
       nextProps.height === this.props.height &&
       arraysEqual(nextProps.groups, this.props.groups) &&
-      arraysEqual(nextProps.groupHeights, this.props.groupHeights)
+      arraysEqual(nextProps.groupHeights, this.props.groupHeights) &&
+      nextProps.width === this.props.width
     )
   }
 
@@ -35,10 +46,23 @@ export default class Sidebar extends Component {
     }
   }
 
-  render() {
-    const { width, groupHeights, height, isRightSidebar } = this.props
+  componentDidUpdate(props, state, foo) {
+    if (this.props.handleSidebarResize.resizing && !props.handleSidebarResize.resizing) {
+      document.addEventListener('mousemove', this.props.handleSidebarResize.move)
+      document.addEventListener('mouseup', this.props.handleSidebarResize.up)
+    } else if (!this.props.handleSidebarResize.resizing && props.handleSidebarResize.resizing) {
+      document.removeEventListener('mousemove', this.props.handleSidebarResize.move)
+      document.removeEventListener('mouseup', this.props.handleSidebarResize.up)
+    }
+  }
 
-    const { groupIdKey, groupTitleKey, groupRightTitleKey } = this.props.keys
+  onSidebarDown = (e) => {
+    this.props.handleSidebarResize.down(e)
+  }
+
+  render() {
+    const {groupHeights, height, width, isRightSidebar} = this.props
+    const {groupIdKey, groupTitleKey, groupRightTitleKey} = this.props.keys
 
     const sidebarStyle = {
       width: `${width}px`,
@@ -79,6 +103,10 @@ export default class Sidebar extends Component {
         style={sidebarStyle}
       >
         <div style={groupsStyle}>{groupLines}</div>
+        <div
+          className={'rct-sidebar-resize'}
+          onMouseDown={this.onSidebarDown}
+        />
       </div>
     )
   }
