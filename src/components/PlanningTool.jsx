@@ -25,7 +25,6 @@ const keys = {
 }
 
 class PlanningTool extends Component {
-
   constructor(props) {
     super(props)
 
@@ -42,6 +41,7 @@ class PlanningTool extends Component {
       groups = []
     }
 
+    //setting default values of items
     for (const item of items) {
       item.parent = item.parent != null ? item.parent : null
       item.className = item.className != null ? item.className : 'item'
@@ -58,6 +58,7 @@ class PlanningTool extends Component {
       item.maximumDuration = item.maximumDuration != null ? item.maximumDuration : false
     }
 
+    //sorting groups tree to order by parent
     groups = groups.sort((a, b) => a.level - b.level).reduce((accumulator, currentValue) => {
       let item = accumulator.find(x => x.id === currentValue.parent)
       let index = accumulator.indexOf(item)
@@ -97,71 +98,10 @@ class PlanningTool extends Component {
     }
   }
 
-  getTaskBackground = (task) => {
-    if (!task['task-type']) {
-      return '#2196F3'
-    }
-    switch (task['task-type']['task-category']) {
-      case 'scheduled_wo':
-        return '#aa0000'
-      case 'task_card':
-        return '#00aa00'
-      case 'maintenance_wo':
-        return '#0000aa'
-      default:
-        return '#2196F3'
-    }
-  }
 
-  buildData = (data, groupsMap, items, level, groupParentId, itemParentId) => {
-    if (!data || !Array.isArray(data)) {
-      return
-    }
-
-    for (const item of data) {
-      const resourceId = item.resource.id + " - " + item.resource.type
-      if (!groupsMap.has(resourceId)) {
-        groupsMap.set(resourceId, {
-          id: groupsMap.size,
-          title: item.resource ? item.resource.title : '',
-          hasChildren: item.planParts && item.planParts.length > 0,
-          parent: groupParentId,
-          open: level < 1,
-          show: level < 2,
-          level: level,
-        })
-      }
-
-      const date = moment(item.type === 'SessionPlan' ? item["start-time"] : item["planned-start-time"]).add('1', 'year').add('2', 'month').add('27', 'day')
-      const endDate = moment(item.type === 'SessionPlan' ? item["end-time"] : item["planned-end-time"]).add('1', 'year').add('2', 'month').add('27', 'day')
-      const itemId = items.length + 1
-
-      items.push({
-        id: itemId,
-        group: groupsMap.get(resourceId).id,
-        title: item.title,
-        start: date,
-        end: endDate,
-        parent: itemParentId,
-        className: 'item',
-        bgColor: this.getTaskBackground(item),
-        color: '#fff',
-        selectedBgColor: '#FFC107',
-        selectedColor: '#000',
-        draggingBgColor: '#f00',
-        highlightBgColor: '#FFA500',
-        highlight: false,
-        canMove: (level > 1 && level !== 3),
-        canResize: "both", //'left','right','both', false
-        minimumDuration: false,
-      })
-
-      if (item.planParts && item.planParts.length > 0) {
-        this.buildData(item.planParts, groupsMap, items, level + 1, groupsMap.get(resourceId).id, itemId)
-      }
-    }
-  }
-
+  /**
+   * Event handler when changing position of item
+   */
   handleItemMove = (itemId, dragTime, newGroupOrder) => {
     const {items, groups} = this.state
 
@@ -183,6 +123,9 @@ class PlanningTool extends Component {
     })
   }
 
+  /**
+   * Event handler when changing duration of item
+   */
   handleItemResize = (itemId, time, edge) => {
     const {items} = this.state
 
@@ -216,6 +159,9 @@ class PlanningTool extends Component {
     })
   }
 
+  /**
+   * Event handler when dragging an item
+   */
   handleItemDrag = ({eventType, itemId, time, edge, newGroupOrder}) => {
     let item = this.state.draggedItem ? this.state.draggedItem.item : undefined
     if (!item) {
@@ -268,6 +214,9 @@ class PlanningTool extends Component {
     return moment.duration(end.diff(start)).asMinutes() > item.maximumDuration
   }
 
+  /**
+   * Event handler for opening and closing group children
+   */
   toggleGroup = (id) => {
     let {groups} = this.state
 
@@ -288,6 +237,9 @@ class PlanningTool extends Component {
     })
   }
 
+  /**
+   * Closing group children
+   */
   closeChildren = (groups, id) => {
     groups.filter(g => g.parent === id).forEach((g) => {
       g.show = false
@@ -301,6 +253,9 @@ class PlanningTool extends Component {
     return groups
   }
 
+  /**
+   * Highlights children of an item
+   */
   highlightChildren = (item) => {
     const items = this.state.items.filter(i => i.parent === item.id)
     for (const item of items) {
@@ -309,6 +264,9 @@ class PlanningTool extends Component {
     }
   }
 
+  /**
+   * Turns off highlighting of every item
+   */
   removeHighlight = () => {
     const items = this.state.items.filter(item => item.highlight)
     for (const item of items) {
@@ -327,6 +285,9 @@ class PlanningTool extends Component {
     })
   }
 
+  /**
+   * Provides data into popup
+   */
   showItemInfo = (item, group, time) => {
     if (!item) {
       return
@@ -362,6 +323,9 @@ class PlanningTool extends Component {
     })
   }
 
+  /**
+   * Mouse down event handler when changing width of sidebar
+   */
   onSidebarDown = (e) => {
     if (e.button !== 0) {
       return
@@ -374,6 +338,9 @@ class PlanningTool extends Component {
     })
   }
 
+  /**
+   * Mouse move event handler when changing width of sidebar
+   */
   onSidebarMove = (e) => {
     e.stopPropagation()
     e.preventDefault()
@@ -390,6 +357,9 @@ class PlanningTool extends Component {
     })
   }
 
+  /**
+   * Mouse up event handler when changing width of sidebar
+   */
   onSidebarUp = (e) => {
     e.stopPropagation()
     e.preventDefault()
@@ -398,11 +368,17 @@ class PlanningTool extends Component {
     })
   }
 
+  /**
+   * Adding item into list of returned changes
+   */
   addUndoItem = (item) => {
     this.redoActions = []
     this.actions.push(Object.assign({}, item))
   }
 
+  /**
+   * Returns last change in component
+   */
   undo = () => {
     if (this.actions.length <= 0) {
       return
@@ -422,6 +398,9 @@ class PlanningTool extends Component {
     })
   }
 
+  /**
+   * Restores last returned change
+   */
   redo = () => {
     if (this.redoActions.length <= 0) {
       return
@@ -441,10 +420,16 @@ class PlanningTool extends Component {
     })
   }
 
+  /**
+   * Updates current time to be displayed in timeline
+   */
   onTimeChange(visibleTimeStart, visibleTimeEnd, updateScrollCanvas, unit) {
     updateScrollCanvas(visibleTimeStart, visibleTimeEnd)
   }
 
+  /**
+   * Focuses group of items in timeline
+   */
   focusItems = (items) => {
     if (!items || !Array.isArray(items) || items.length <= 0) {
       return
@@ -472,6 +457,9 @@ class PlanningTool extends Component {
     this.timeline.current.updateScrollCanvas(dateStart.valueOf(), dateEnd.valueOf())
   }
 
+  /**
+   * Custom item renderer
+   */
   itemRenderer = ({item, timelineContext, itemContext, getItemProps, getResizeProps}) => {
     const {left: leftResizeProps, right: rightResizeProps} = getResizeProps()
     let backgroundColor = item.bgColor
@@ -500,6 +488,9 @@ class PlanningTool extends Component {
             color: color,
             minWidth: 20,
           },
+          /**
+           * Event handler when click on an item
+           */
           onMouseDown: () => {
             item.selected = true
             this.removeHighlight()
@@ -514,6 +505,7 @@ class PlanningTool extends Component {
         id={'item-' + item.id}
         className={item.canMove ? 'movable-item' : 'static-item'}
       >
+        {/*left resize*/}
         {itemContext.selected && (item.canResize === 'both' || item.canResize === 'left') ?
           itemContext.useResizeHandle ? <div {...leftResizeProps}/> : <span style={{
             cursor: 'ew-resize',
@@ -539,6 +531,7 @@ class PlanningTool extends Component {
           {itemContext.title}
         </div>
 
+        {/*dependencies of en item*/}
         {item.dependency ?
           <Xarrow
             start={'item-' + item.dependency}
@@ -550,6 +543,7 @@ class PlanningTool extends Component {
           ''
         }
 
+        {/*right resize*/}
         {itemContext.selected && (item.canResize === 'both' || item.canResize === 'right') ?
           itemContext.useResizeHandle ? <div {...rightResizeProps}/> : <span style={{
             cursor: 'ew-resize',
@@ -567,6 +561,10 @@ class PlanningTool extends Component {
   render() {
     const {groups, items, defaultTimeStart, defaultTimeEnd, sidebarWidth, popup, milestones} = this.state
 
+    /**
+     * Filters groups which should be displayed in timeline
+     * and sets up event handler to toggle groups that have children
+     */
     const newGroups = groups.filter((g) => g.show).map((group) => {
       return Object.assign({}, group, {
         title: group.hasChildren ? (
@@ -614,7 +612,10 @@ class PlanningTool extends Component {
             resizing: this.state.sidebarResizing,
           }}
         >
+          {/*current time marker*/}
           <TodayMarker interval={1000}/>
+
+          {/*milestones*/}
           {milestones.length > 0 ?
             milestones.map((milestone, i) =>
               <CustomMarker date={milestone.date.valueOf()} key={'marker-' + i}>
@@ -644,6 +645,7 @@ class PlanningTool extends Component {
           }
         </Timeline>
 
+        {/*undo redo*/}
         <div className="action-buttons">
           <button className={`action-button ${this.actions.length <= 0 ? 'disabled' : ''}`} onClick={this.undo}>
             Undo
@@ -658,6 +660,7 @@ class PlanningTool extends Component {
           focus
         </div>*/}
 
+        {/*popup*/}
         {popup.open && (
           popup.custom ?
             popup.custom({
