@@ -17,7 +17,7 @@ export default {
 const groups = [
   {
     "id": 0,
-    "title": "",
+    "title": "Maintenance plan",
     "hasChildren": true,
     "parent": null,
     "open": true,
