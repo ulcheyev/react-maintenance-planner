@@ -46,6 +46,9 @@ export default class Sidebar extends Component {
     }
   }
 
+  /**
+   * event listeners setup for change of sidebar width
+   */
   componentDidUpdate(props, state, foo) {
     if (this.props.handleSidebarResize.resizing && !props.handleSidebarResize.resizing) {
       document.addEventListener('mousemove', this.props.handleSidebarResize.move)

@@ -1,3 +1,5 @@
+//Story with custom detail popup
+
 import React from 'react'
 import PlanningTool from '../components/PlanningTool'
 import moment from 'moment'

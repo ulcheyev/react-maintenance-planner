@@ -1,3 +1,5 @@
+//Story with milestones
+
 import React from 'react'
 import PlanningTool from '../components/PlanningTool'
 import moment from 'moment'
@@ -15,7 +17,7 @@ export default {
 const groups = [
   {
     "id": 0,
-    "title": "",
+    "title": "Maintenance plan",
     "hasChildren": true,
     "parent": null,
     "open": true,
