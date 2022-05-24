@@ -1,16 +1,15 @@
 {
-  "name": "planning-tool",
+  "name": "react-maintenance-planner",
   "version": "0.1.0",
   "private": true,
   "source": "src/index.js",
-  "types": "./dist/PlanningTool.d.ts",
-  "main": "./dist/PlanningTool.js",
+  "main": "./dist/react-maintenance-planner.js",
   "exports": {
-    "require": "./dist/PlanningTool.js",
-    "default": "./dist/PlanningTool.modern.js"
+    "require": "./dist/react-maintenance-planner.js",
+    "default": "./dist/react-maintenance-planner.modern.js"
   },
-  "module": "./dist/PlanningTool.module.js",
-  "unpkg": "./dist/PlanningTool.umd.js",
+  "module": "./dist/react-maintenance-planner.module.js",
+  "unpkg": "./dist/react-maintenance-planner.umd.js",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^12.1.4",
