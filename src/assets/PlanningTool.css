@@ -26,6 +26,10 @@
   z-index: 100;
 }
 
+.explanatory-notes-container {
+  display: flex;
+  flex-direction: row;
+}
 
 .explanatory-notes, .popup {
   margin: 25px;

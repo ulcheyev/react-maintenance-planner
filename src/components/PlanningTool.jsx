@@ -69,7 +69,7 @@ class PlanningTool extends Component {
     }, [])
 
     const defaultTimeStart = items.length > 0 ? moment(items[0].start).add(-12, 'hour') : moment()
-    const defaultTimeEnd = defaultTimeStart.clone().add(7, 'day')
+    const defaultTimeEnd = items.length > 0 ? moment(items[0].end).add(12, 'hour') : moment()
 
     const sidebarWidth = 250
     const sidebarResizing = false
@@ -661,33 +661,35 @@ class PlanningTool extends Component {
         </div>*/}
 
         {/*popup*/}
-        {popup.open && (
-          popup.custom ?
-            popup.custom({
-              item: popup.item,
-              group: popup.group,
-            })
-            :
-            <Popup
-              item={popup.item}
-              group={popup.group}
-            />
-        )}
+        <div className="explanatory-notes-container">
+          <div className="explanatory-notes">
+            <h3>Task types</h3>
+            <div className="note">
+              <span className="color scheduled-wo"/>
+              Scheduled_wo
+            </div>
+            <div className="note">
+              <span className="color task-card"/>
+              Task_card
+            </div>
+            <div className="note">
+              <span className="color maintenance-wo"/>
+              Maintenance_wo
+            </div>
+          </div>
 
-        <div className="explanatory-notes">
-          <h3>Task types</h3>
-          <div className="note">
-            <span className="color scheduled-wo"/>
-            Scheduled_wo
-          </div>
-          <div className="note">
-            <span className="color task-card"/>
-            Task_card
-          </div>
-          <div className="note">
-            <span className="color maintenance-wo"/>
-            Maintenance_wo
-          </div>
+          {popup.open && (
+              popup.custom ?
+                  popup.custom({
+                    item: popup.item,
+                    group: popup.group,
+                  })
+                  :
+                  <Popup
+                      item={popup.item}
+                      group={popup.group}
+                  />
+          )}
         </div>
       </div>
     )
