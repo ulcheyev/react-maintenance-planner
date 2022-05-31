@@ -1,3 +1,15 @@
+.timeline-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.timeline {
+  position: relative;
+  width: calc(100% - 500px);
+}
+
 .task_card {
   background: #0000aa !important;
 }
@@ -15,6 +27,14 @@
   padding-right: 4px;
 }
 
+.rct-dateHeader.rct-dateHeader-primary {
+  background-color: #c42020;
+}
+
+.rct-dateHeader {
+  background-color: #eeeeee;
+}
+
 .rct-sidebar-resize {
   background-color: #ccc;
   position: absolute;
@@ -27,12 +47,17 @@
 }
 
 .explanatory-notes-container {
+  position: fixed;
   display: flex;
-  flex-direction: row;
+  padding: 2rem;
+  flex-direction: column;
+  top: 0;
+  right: 0;
 }
 
 .explanatory-notes, .popup {
-  margin: 25px;
+  background-color: #dadada;
+  margin-top: 25px;
   padding: 15px 25px 35px 25px;
   border: 1px solid #333;
   width: 350px;
@@ -106,7 +131,6 @@
 }
 
 .action-button {
-  display: inline-block;
   padding: 10px;
   background-color: #fff;
   border: 1px solid #333;

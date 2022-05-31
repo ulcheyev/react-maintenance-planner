@@ -457,6 +457,26 @@ class PlanningTool extends Component {
     this.timeline.current.updateScrollCanvas(dateStart.valueOf(), dateEnd.valueOf())
   }
 
+  renderPopup = (popup) => {
+    // const {popup} = this.state
+    return (
+        <>
+          {popup.open && (
+              popup.custom ?
+                  popup.custom({
+                    item: popup.item,
+                    group: popup.group,
+                  })
+                  :
+                  <Popup
+                      item={popup.item}
+                      group={popup.group}
+                  />
+          )}
+        </>
+    )
+  }
+
   /**
    * Custom item renderer
    */
@@ -584,114 +604,100 @@ class PlanningTool extends Component {
     })
 
     return (
-      <div>
-        <Timeline
-          ref={this.timeline}
-          groups={newGroups}
-          items={items}
-          keys={keys}
-          fullUpdate
-          itemTouchSendsClick={false}
-          stackItems
-          itemHeightRatio={0.75}
-          canMove={true}
-          canResize={"both"}
-          sidebarWidth={sidebarWidth}
-          defaultTimeStart={defaultTimeStart}
-          defaultTimeEnd={defaultTimeEnd}
-          onTimeChange={this.onTimeChange}
-          itemRenderer={this.itemRenderer}
-          onItemMove={this.handleItemMove}
-          onItemResize={this.handleItemResize}
-          onItemDeselect={this.itemDeselected}
-          onItemDrag={this.handleItemDrag}
-          handleSidebarResize={{
-            down: this.onSidebarDown,
-            move: this.onSidebarMove,
-            up: this.onSidebarUp,
-            resizing: this.state.sidebarResizing,
-          }}
-        >
-          {/*current time marker*/}
-          <TodayMarker interval={1000}/>
+      <>
+        <div className="timeline-container">
+          <Timeline className="timeline"
+            ref={this.timeline}
+            groups={newGroups}
+            items={items}
+            keys={keys}
+            fullUpdate
+            itemTouchSendsClick={false}
+            stackItems
+            itemHeightRatio={0.75}
+            canMove={true}
+            canResize={"both"}
+            sidebarWidth={sidebarWidth}
+            defaultTimeStart={defaultTimeStart}
+            defaultTimeEnd={defaultTimeEnd}
+            onTimeChange={this.onTimeChange}
+            itemRenderer={this.itemRenderer}
+            onItemMove={this.handleItemMove}
+            onItemResize={this.handleItemResize}
+            onItemDeselect={this.itemDeselected}
+            onItemDrag={this.handleItemDrag}
+            handleSidebarResize={{
+              down: this.onSidebarDown,
+              move: this.onSidebarMove,
+              up: this.onSidebarUp,
+              resizing: this.state.sidebarResizing,
+            }}
+          >
+            {/*current time marker*/}
+            <TodayMarker interval={1000}/>
 
-          {/*milestones*/}
-          {milestones.length > 0 ?
-            milestones.map((milestone, i) =>
-              <CustomMarker date={milestone.date.valueOf()} key={'marker-' + i}>
-                {({styles, date}) => {
-                  const customStyles = {
-                    ...styles,
-                    backgroundColor: milestone.color ? milestone.color : '#000',
-                    width: '3px',
-                    pointerEvents: 'auto',
-                    zIndex: 1000,
-                  }
+            {/*milestones*/}
+            {milestones.length > 0 ?
+              milestones.map((milestone, i) =>
+                <CustomMarker date={milestone.date.valueOf()} key={'marker-' + i}>
+                  {({styles, date}) => {
+                    const customStyles = {
+                      ...styles,
+                      backgroundColor: milestone.color ? milestone.color : '#000',
+                      width: '3px',
+                      pointerEvents: 'auto',
+                      zIndex: 1000,
+                    }
 
-                  return <div
-                    style={customStyles}
-                    className={'milestone'}
-                  >
-                    <span className="milestone-label">
-                      {milestone.label ? milestone.label : ''}<br/>
-                      <span className="milestone-date">{milestone.date.format('LLL')}</span>
-                    </span>
-                  </div>
-                }}
-              </CustomMarker>
-            )
-            :
-            ''
-          }
-        </Timeline>
-
-        {/*undo redo*/}
-        <div className="action-buttons">
-          <button className={`action-button ${this.actions.length <= 0 ? 'disabled' : ''}`} onClick={this.undo}>
-            Undo
-          </button>
-          <button className={`action-button ${this.redoActions.length <= 0 ? 'disabled' : ''}`} onClick={this.redo}>
-            Redo
-          </button>
+                    return <div
+                      style={customStyles}
+                      className={'milestone'}
+                    >
+                      <span className="milestone-label">
+                        {milestone.label ? milestone.label : ''}<br/>
+                        <span className="milestone-date">{milestone.date.format('LLL')}</span>
+                      </span>
+                    </div>
+                  }}
+                </CustomMarker>
+              )
+              :
+              ''
+            }
+          </Timeline>
+          <div className="explanatory-notes-container">
+            <div className="explanatory-notes">
+              <h3>Task types</h3>
+              <div className="note">
+                <span className="color scheduled-wo"/>
+                Scheduled_wo
+              </div>
+              <div className="note">
+                <span className="color task-card"/>
+                Task_card
+              </div>
+              <div className="note">
+                <span className="color maintenance-wo"/>
+                Maintenance_wo
+              </div>
+            </div>
+            {this.renderPopup(popup)}
+            {/*undo redo*/}
+            <div className="action-buttons">
+              <button className={`action-button ${this.actions.length <= 0 ? 'disabled' : ''}`} onClick={this.undo}>
+                Undo
+              </button>
+              <button className={`action-button ${this.redoActions.length <= 0 ? 'disabled' : ''}`} onClick={this.redo}>
+                Redo
+              </button>
+            </div>
+          </div>
         </div>
-
 
         {/*<div onClick={() => this.focusItems(items.filter(item => (item.id === 8 || item.id === 10)))}>
           focus
         </div>*/}
-
-        {/*popup*/}
-        <div className="explanatory-notes-container">
-          <div className="explanatory-notes">
-            <h3>Task types</h3>
-            <div className="note">
-              <span className="color scheduled-wo"/>
-              Scheduled_wo
-            </div>
-            <div className="note">
-              <span className="color task-card"/>
-              Task_card
-            </div>
-            <div className="note">
-              <span className="color maintenance-wo"/>
-              Maintenance_wo
-            </div>
-          </div>
-
-          {popup.open && (
-              popup.custom ?
-                  popup.custom({
-                    item: popup.item,
-                    group: popup.group,
-                  })
-                  :
-                  <Popup
-                      item={popup.item}
-                      group={popup.group}
-                  />
-          )}
-        </div>
-      </div>
+        </>
     )
   }
 }

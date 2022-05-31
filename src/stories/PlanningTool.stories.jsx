@@ -20,8 +20,8 @@ const groups = [
     "title": "",
     "hasChildren": true,
     "parent": null,
-    "open": true,
-    "show": true,
+    "open": false,
+    "show": false,
     "level": 0
   },
   {
