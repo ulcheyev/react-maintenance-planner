@@ -3,13 +3,14 @@ import moment from "moment"
 
 import Timeline, {
   TodayMarker,
-  CustomMarker,
+  CustomMarker
 } from "./timeline/src"
 import './timeline/src/lib/Timeline.css'
 import Xarrow from "react-xarrows"
 import './../assets/PlanningTool.css'
 import PropTypes from "prop-types"
 import Popup from './Popup'
+import EditIcon from "../assets/icons/EditIcon";
 
 const keys = {
   groupIdKey: "id",
@@ -84,6 +85,8 @@ class PlanningTool extends Component {
       milestones = props.milestones
     }
 
+    const showIcons = false
+
     this.timeline = React.createRef()
 
     this.state = {
@@ -95,6 +98,7 @@ class PlanningTool extends Component {
       sidebarResizing,
       popup,
       milestones,
+      showIcons
     }
   }
 
@@ -578,6 +582,84 @@ class PlanningTool extends Component {
     )
   }
 
+  handleShowIconsOnMouseEnter = (id) => {
+    let {groups} = this.state
+
+    const group = groups.find(g => g.id === id)
+    group.showIcons = true
+
+    this.setState({
+      groups: groups
+    })
+  }
+
+  handleShowIconsOnMouseLeave = (id) => {
+    let {groups} = this.state
+
+    const group = groups.find(g => g.id === id)
+    group.showIcons = false
+
+    this.setState({
+      groups: groups
+    })
+  }
+
+  handleEditMode = (e, id) => {
+    e.stopPropagation();
+    let {groups} = this.state
+
+    const group = groups.find(g => g.id === id)
+    group.isEditMode = !group.isEditMode
+
+    this.setState({
+      groups: groups
+    })
+  }
+
+  handleInputFieldValue = (e, id) => {
+    let {groups} = this.state
+    const group = groups.find(g => g.id === id)
+    group.title = e.target.value
+  }
+
+  handleInputFieldKeyUp = (e, id) => {
+    if (e.key === 'Enter' && e.ctrlKey) {
+      this.handleEditMode(e, id);
+      this.handleInputFieldValue(e, id)
+    }
+    if (e.key === 'Escape') this.handleEditMode(e, id)
+  }
+
+  renderEditMode = () => {
+    return (
+        <input
+            onClick={e => e.stopPropagation()}
+            placeholder="Ctrl+Enter / Escape" />
+    )
+  }
+
+  renderGroup = (group) => {
+    return (
+        <div
+            onMouseEnter={() => this.handleShowIconsOnMouseEnter(group.id)}
+            onMouseLeave={() => this.handleShowIconsOnMouseLeave(group.id)}
+            onKeyUp={(e) => this.handleInputFieldKeyUp(e, group.id)}
+            className="resource"
+        >
+          {group.isEditMode ?
+              (group.open ? "[-] " : "[+] ") :
+              (group.open ? `[-] ${group.title} ` : `[+] ${group.title} `)}
+          {group.isEditMode && this.renderEditMode(group.id)}
+          {
+          <div
+              onClick={(e) => this.handleEditMode(e, group.id)}
+              className="edit-icon"><EditIcon />
+          </div>
+        }
+        </div>
+    )
+  }
+
   render() {
     const {groups, items, defaultTimeStart, defaultTimeEnd, sidebarWidth, popup, milestones} = this.state
 
@@ -593,7 +675,7 @@ class PlanningTool extends Component {
                  cursor: 'pointer',
                  paddingLeft: group.level * 20
                }}>
-            {group.open ? '[-]' : '[+]'} {group.title}
+            {this.renderGroup(group)}
           </div>
         ) : (
           <div style={{paddingLeft: group.level * 20}}>
