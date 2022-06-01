@@ -650,7 +650,7 @@ class PlanningTool extends Component {
               (group.open ? "[-] " : "[+] ") :
               (group.open ? `[-] ${group.title} ` : `[+] ${group.title} `)}
           {group.isEditMode && this.renderEditMode(group.id)}
-          {
+          {group.showIcons &&
           <div
               onClick={(e) => this.handleEditMode(e, group.id)}
               className="edit-icon"><EditIcon />
