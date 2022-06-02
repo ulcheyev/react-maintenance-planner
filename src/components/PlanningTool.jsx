@@ -582,10 +582,10 @@ class PlanningTool extends Component {
     )
   }
 
-  handleShowIconsOnMouseEnter = (id) => {
+  handleShowIconsOnMouseEnter = (groupId) => {
     let {groups} = this.state
 
-    const group = groups.find(g => g.id === id)
+    const group = groups.find(g => g.id === groupId)
     group.showIcons = true
 
     this.setState({
@@ -593,10 +593,10 @@ class PlanningTool extends Component {
     })
   }
 
-  handleShowIconsOnMouseLeave = (id) => {
+  handleShowIconsOnMouseLeave = (groupId) => {
     let {groups} = this.state
 
-    const group = groups.find(g => g.id === id)
+    const group = groups.find(g => g.id === groupId)
     group.showIcons = false
 
     this.setState({
@@ -604,11 +604,11 @@ class PlanningTool extends Component {
     })
   }
 
-  handleEditMode = (e, id) => {
+  handleEditMode = (e, groupId) => {
     e.stopPropagation();
     let {groups} = this.state
 
-    const group = groups.find(g => g.id === id)
+    const group = groups.find(g => g.id === groupId)
     group.isEditMode = !group.isEditMode
 
     this.setState({
@@ -616,18 +616,18 @@ class PlanningTool extends Component {
     })
   }
 
-  handleInputFieldValue = (e, id) => {
+  handleInputFieldValue = (e, groupId) => {
     let {groups} = this.state
-    const group = groups.find(g => g.id === id)
+    const group = groups.find(g => g.id === groupId)
     group.title = e.target.value
   }
 
-  handleInputFieldKeyUp = (e, id) => {
+  handleInputFieldKeyUp = (e, groupId) => {
     if (e.key === 'Enter' && e.ctrlKey) {
-      this.handleEditMode(e, id);
-      this.handleInputFieldValue(e, id)
+      this.handleEditMode(e, groupId);
+      this.handleInputFieldValue(e, groupId)
     }
-    if (e.key === 'Escape') this.handleEditMode(e, id)
+    if (e.key === 'Escape') this.handleEditMode(e, groupId)
   }
 
   renderEditMode = () => {
