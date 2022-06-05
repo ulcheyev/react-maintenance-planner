@@ -3,7 +3,9 @@
 
 React library used for planning maintenance.
 
-The library is based on [react-calendar-timeline](https://github.com/namespace-ee/react-calendar-timeline).
+The library is based on [react-calendar-timeline](https://github.com/namespace-ee/react-calendar-timeline). <br/>
+Currently taken commit - [44bed94](https://github.com/namespace-ee/react-calendar-timeline/commit/44bed941f395f775fb86626933d55dcbd3401fb7). <br/>
+The source code of the library is located in folder **src/components/timeline**.
 
 ## Live demo
 Check out [live demo using storybook](https://react-maintenance-planner.netlify.app/).
