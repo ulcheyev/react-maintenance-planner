@@ -38,7 +38,7 @@ const Popup = ({item, group}) => {
                 :
                 "Not defined"}
             </p>
-            {<ProgressBar width={350} progress={getTaskProgress()}/>}
+            {<ProgressBar progress={getTaskProgress()}/>}
         </div>
     </div>
   )
