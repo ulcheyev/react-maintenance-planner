@@ -805,6 +805,8 @@ PlanningTool.propTypes = {
       canResize: PropTypes.oneOf(['both', 'left', 'right', false]),
       minimumDuration: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf([false])]),
       maximumDuration: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf([false])]),
+      workTime: PropTypes.number,
+      plannedWorkTime: PropTypes.number
     }
   )).isRequired,
   groups: PropTypes.arrayOf(PropTypes.shape({
