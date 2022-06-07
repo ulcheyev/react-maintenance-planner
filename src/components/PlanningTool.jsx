@@ -641,21 +641,28 @@ class PlanningTool extends Component {
   renderGroup = (group) => {
     return (
         <div
-            onMouseEnter={() => this.handleShowIconsOnMouseEnter(group.id)}
-            onMouseLeave={() => this.handleShowIconsOnMouseLeave(group.id)}
-            onKeyUp={(e) => this.handleInputFieldKeyUp(e, group.id)}
             className="resource"
+            onClick={() => this.toggleGroup(group.id)}
+            style={{cursor: 'pointer'}}
         >
-          {group.isEditMode ?
-              (group.open ? "[-] " : "[+] ") :
-              (group.open ? `[-] ${group.title} ` : `[+] ${group.title} `)}
+          {
+            group.hasChildren ?
+                group.isEditMode ?
+                    group.open ? "[-] "
+                        : "[+] "
+                    : group.open ? `[-] ${group.title} `
+                        : `[+] ${group.title} `
+                : group.isEditMode ? ""
+                    : group.title
+          }
+
           {group.isEditMode && this.renderEditMode(group.id)}
           {group.showIcons &&
           <div
               onClick={(e) => this.handleEditMode(e, group.id)}
-              className="edit-icon"><HiOutlinePencil />
+              className="edit-icon"><HiOutlinePencil/>
           </div>
-        }
+          }
         </div>
     )
   }
@@ -669,19 +676,16 @@ class PlanningTool extends Component {
      */
     const newGroups = groups.filter((g) => g.show).map((group) => {
       return Object.assign({}, group, {
-        title: group.hasChildren ? (
-          <div onClick={() => this.toggleGroup(group.id)}
-               style={{
-                 cursor: 'pointer',
-                 paddingLeft: group.level * 20
-               }}>
-            {this.renderGroup(group)}
-          </div>
-        ) : (
-          <div style={{paddingLeft: group.level * 20}}>
-            {group.title}
-          </div>
-        )
+        title:
+            <div
+                onMouseEnter={() => this.handleShowIconsOnMouseEnter(group.id)}
+                onMouseLeave={() => this.handleShowIconsOnMouseLeave(group.id)}
+                onKeyUp={(e) => this.handleInputFieldKeyUp(e, group.id)}
+                style={{paddingLeft: group.level * 20}}
+
+            >
+              {this.renderGroup(group)}
+            </div>
       })
     })
 
