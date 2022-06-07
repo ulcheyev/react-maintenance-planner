@@ -1,5 +1,6 @@
 import React, {Component} from "react"
 import moment from "moment"
+import { HiOutlinePencil } from "react-icons/hi";
 
 import Timeline, {
   TodayMarker,
@@ -10,7 +11,6 @@ import Xarrow from "react-xarrows"
 import './../assets/PlanningTool.css'
 import PropTypes from "prop-types"
 import Popup from './Popup'
-import EditIcon from "../assets/icons/EditIcon";
 
 const keys = {
   groupIdKey: "id",
@@ -653,7 +653,7 @@ class PlanningTool extends Component {
           {group.showIcons &&
           <div
               onClick={(e) => this.handleEditMode(e, group.id)}
-              className="edit-icon"><EditIcon />
+              className="edit-icon"><HiOutlinePencil />
           </div>
         }
         </div>
