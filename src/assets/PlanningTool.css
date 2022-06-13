@@ -169,7 +169,11 @@
   margin-left: .5rem;
 }
 
-.resource .edit-icon svg:hover {
+.edit-icon svg:hover {
   opacity: .3;
   transition: .3s;
+}
+
+.rct-items .edit-icon svg {
+  margin-left: 1rem;
 }

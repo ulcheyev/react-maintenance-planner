@@ -72,7 +72,7 @@ class PlanningTool extends Component {
     const defaultTimeStart = items.length > 0 ? moment(items[0].start).add(-12, 'hour') : moment()
     const defaultTimeEnd = items.length > 0 ? moment(items[0].end).add(12, 'hour') : moment()
 
-    const sidebarWidth = 250
+    const sidebarWidth = 300
     const sidebarResizing = false
     const popup = {
       open: false,
@@ -462,7 +462,6 @@ class PlanningTool extends Component {
   }
 
   renderPopup = (popup) => {
-    // const {popup} = this.state
     return (
         <>
           {popup.open && (
@@ -506,28 +505,31 @@ class PlanningTool extends Component {
 
     return (
       <div
-        {...getItemProps({
-          style: {
-            background: backgroundColor,
-            color: color,
-            minWidth: 20,
-          },
-          /**
-           * Event handler when click on an item
-           */
-          onMouseDown: () => {
-            item.selected = true
-            this.removeHighlight()
-            this.highlightChildren(item)
-            this.showItemInfo(this.state.items.find(i => i.id === item.id))
-            this.setState({
-              items: this.state.items
-            })
-          },
+          onMouseEnter={() => this.handleShowIconsOnMouseEnter(null, item.id)}
+          onMouseLeave={() => this.handleShowIconsOnMouseLeave(null, item.id)}
+          onKeyUp={(e) => this.handleInputFieldOnKeyUp(e, null, item.id)}
+          {...getItemProps({
+            style: {
+              background: backgroundColor,
+              color: color,
+              minWidth: 20,
+            },
+            /**
+             * Event handler when click on an item
+             */
+            onMouseDown: () => {
+              item.selected = true
+              this.removeHighlight()
+              this.highlightChildren(item)
+              this.showItemInfo(this.state.items.find(i => i.id === item.id))
+              this.setState({
+                items: this.state.items
+              })
+            },
 
-        })}
-        id={'item-' + item.id}
-        className={item.canMove ? 'movable-item' : 'static-item'}
+          })}
+          id={'item-' + item.id}
+          className={item.canMove ? 'movable-item' : 'static-item'}
       >
         {/*left resize*/}
         {itemContext.selected && (item.canResize === 'both' || item.canResize === 'left') ?
@@ -552,7 +554,13 @@ class PlanningTool extends Component {
             position: 'relative',
           }}
         >
-          {itemContext.title}
+          {item.isEditMode ? this.renderEditMode(item.id) : itemContext.title}
+          {item.showIcons &&
+          <span
+              onClick={(e) => this.handleEditMode(e, null, item.id)}
+              className="edit-icon"><HiOutlinePencil/>
+          </span>
+          }
         </div>
 
         {/*dependencies of en item*/}
@@ -582,57 +590,105 @@ class PlanningTool extends Component {
     )
   }
 
-  handleShowIconsOnMouseEnter = (groupId) => {
-    let {groups} = this.state
+  handleShowIconsOnMouseEnter = (groupId, itemId) => {
+    let {groups} = this.state;
+    let {items} = this.state;
 
-    const group = groups.find(g => g.id === groupId)
-    group.showIcons = true
+    if (groupId) {
+      const group = groups.find(g => g.id === groupId)
+      group.showIcons = true
 
-    this.setState({
-      groups: groups
-    })
-  }
-
-  handleShowIconsOnMouseLeave = (groupId) => {
-    let {groups} = this.state
-
-    const group = groups.find(g => g.id === groupId)
-    group.showIcons = false
-
-    this.setState({
-      groups: groups
-    })
-  }
-
-  handleEditMode = (e, groupId) => {
-    e.stopPropagation();
-    let {groups} = this.state
-
-    const group = groups.find(g => g.id === groupId)
-    group.isEditMode = !group.isEditMode
-
-    this.setState({
-      groups: groups
-    })
-  }
-
-  handleInputFieldValue = (e, groupId) => {
-    let {groups} = this.state
-    const group = groups.find(g => g.id === groupId)
-    group.title = e.target.value
-  }
-
-  handleInputFieldKeyUp = (e, groupId) => {
-    if (e.key === 'Enter' && e.ctrlKey) {
-      this.handleEditMode(e, groupId);
-      this.handleInputFieldValue(e, groupId)
+      this.setState({
+        groups: groups
+      })
     }
-    if (e.key === 'Escape') this.handleEditMode(e, groupId)
+
+    if (itemId) {
+      const item = items.find(g => g.id === itemId)
+      item.showIcons = true
+
+      this.setState({
+        items: items
+      })
+    }
+  }
+
+  handleShowIconsOnMouseLeave = (groupId, itemId) => {
+    let {groups} = this.state;
+    let {items} = this.state;
+
+    if (groupId) {
+      const group = groups.find(g => g.id === groupId)
+      group.showIcons = false
+
+      this.setState({
+        groups: groups
+      })
+    }
+
+    if (itemId) {
+      const item = items.find(g => g.id === itemId)
+      item.showIcons = false
+
+      this.setState({
+        items: items
+      })
+    }
+  }
+
+  handleEditMode = (e, groupId, itemId) => {
+    e.stopPropagation();
+
+    let {groups} = this.state;
+    let {items} = this.state;
+
+    if (groupId) {
+      const group = groups.find(g => g.id === groupId)
+      group.isEditMode = !group.isEditMode
+
+      this.setState({
+        groups: groups
+      })
+    }
+
+    if (itemId) {
+      const item = items.find(g => g.id === itemId)
+      item.isEditMode = !item.isEditMode
+      this.setState({
+        items: items
+      })
+    }
+  }
+
+  handleInputFieldValue = (e, groupId, itemId) => {
+    let {groups} = this.state
+    let {items} = this.state
+
+    if (groupId) {
+      const group = groups.find(g => g.id === groupId)
+      group.title = e.target.value
+    }
+
+    if (itemId) {
+      console.log(itemId)
+      const item = items.find(g => g.id === itemId)
+      item.title = e.target.value
+    }
+  }
+
+  handleInputFieldOnKeyUp = (e, groupId, itemId) => {
+    console.log(itemId)
+    if (e.key === 'Enter' && e.ctrlKey) {
+      this.handleEditMode(e, groupId, itemId);
+      this.handleInputFieldValue(e, groupId, itemId)
+    }
+    if (e.key === 'Escape') this.handleEditMode(e, groupId, itemId)
   }
 
   renderEditMode = () => {
     return (
         <input
+            autoFocus
             onClick={e => e.stopPropagation()}
             placeholder="Ctrl+Enter / Escape" />
     )
@@ -680,7 +736,7 @@ class PlanningTool extends Component {
             <div
                 onMouseEnter={() => this.handleShowIconsOnMouseEnter(group.id)}
                 onMouseLeave={() => this.handleShowIconsOnMouseLeave(group.id)}
-                onKeyUp={(e) => this.handleInputFieldKeyUp(e, group.id)}
+                onKeyUp={(e) => this.handleInputFieldOnKeyUp(e, group.id)}
                 style={{paddingLeft: group.level * 20}}
 
             >
