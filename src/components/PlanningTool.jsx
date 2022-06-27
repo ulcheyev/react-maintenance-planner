@@ -90,7 +90,10 @@ class PlanningTool extends Component {
     const showIcons = false
 
     this.timeline = React.createRef()
-    this.addResourceInput = React.createRef()
+    this.addResourceRefs = {
+      name: React.createRef(),
+      child: React.createRef(),
+    }
 
     const addResourceModal = false
 
@@ -117,7 +120,7 @@ class PlanningTool extends Component {
 
     const group = groups.filter(g => g.show)[newGroupOrder]
 
-    this.addUndoItem(items.find(i => i.id === itemId))
+    this.addUndoItem(items.find(i => i.id === itemId), 'item-edit', {}, true)
 
     this.setState({
       items: items.map(item =>
@@ -141,7 +144,7 @@ class PlanningTool extends Component {
 
     const item = items.find(item => item.id === itemId)
 
-    this.addUndoItem(item)
+    this.addUndoItem(item, 'item-edit', {}, true)
 
     let start = moment(edge === "left" ? time : item.start)
     let end = moment(edge === "left" ? item.end : time)
@@ -381,9 +384,23 @@ class PlanningTool extends Component {
   /**
    * Adding item into list of returned changes
    */
-  addUndoItem = (item) => {
-    this.redoActions = []
-    this.actions.push(Object.assign({}, item))
+  addUndoItem = (item, actionName, params = {}, removeRedos = false) => {
+    if (removeRedos) {
+      this.redoActions = []
+    }
+    this.actions.push({
+      item: Object.assign({}, item),
+      actionName,
+      params,
+    })
+  }
+
+  addRedoItem = (item, actionName, params = {}) => {
+    this.redoActions.push({
+      item,
+      actionName,
+      params,
+    })
   }
 
   /**
@@ -393,19 +410,47 @@ class PlanningTool extends Component {
     if (this.actions.length <= 0) {
       return
     }
-    const {items} = this.state
+    const {items, groups} = this.state
 
-    const undoItem = this.actions.pop()
-    this.redoActions.push(items.find(i => i.id === undoItem.id))
+    const undoAction = this.actions.pop()
 
-    this.setState({
-      items: items.map(item =>
-        item.id === undoItem.id
-          ? Object.assign({}, undoItem)
-          : item
-      ),
-      draggedItem: undefined
-    })
+    if (undoAction.actionName === 'item-edit') {
+      const undoItem = undoAction.item
+      this.addRedoItem(items.find(i => i.id === undoItem.id), undoAction.actionName)
+
+      this.setState({
+        items: items.map(item =>
+          item.id === undoItem.id
+            ? Object.assign({}, undoItem)
+            : item
+        ),
+        draggedItem: undefined
+      })
+      return
+    }
+    if (undoAction.actionName === 'resource-add') {
+      const undoGroup = undoAction.item
+
+      const group = groups.find(g => g.id === undoGroup.id)
+      const parent = groups.find(p => p.id === group.parent)
+      const index = groups.indexOf(group)
+
+      if (index > -1) {
+        groups.splice(index, 1)
+        this.addRedoItem(group, undoAction.actionName, {
+          index,
+        })
+      }
+
+      if (groups.filter(g => g.parent === parent.id).length <= 0) {
+        parent.hasChildren = false
+      }
+
+      this.setState({
+        groups,
+      })
+      return
+    }
   }
 
   /**
@@ -415,19 +460,37 @@ class PlanningTool extends Component {
     if (this.redoActions.length <= 0) {
       return
     }
-    const {items} = this.state
+    const {items, groups} = this.state
 
-    const redoItem = this.redoActions.pop()
-    this.actions.push(items.find(i => i.id === redoItem.id))
+    console.log(this.redoActions)
+    const redoAction = this.redoActions.pop()
 
-    this.setState({
-      items: items.map(item =>
-        item.id === redoItem.id
-          ? Object.assign({}, redoItem)
-          : item
-      ),
-      draggedItem: undefined
-    })
+    if (redoAction.actionName === 'item-edit') {
+      const redoItem = redoAction.item
+      this.addUndoItem(items.find(i => i.id === redoItem.id), redoAction.actionName)
+
+      this.setState({
+        items: items.map(item =>
+          item.id === redoItem.id
+            ? Object.assign({}, redoItem)
+            : item
+        ),
+        draggedItem: undefined
+      })
+      return
+    }
+    if (redoAction.actionName === 'resource-add') {
+      const redoGroup = redoAction.item
+      this.addUndoItem(redoGroup, redoAction.actionName)
+
+      groups.splice(redoAction.params.index, 0, redoGroup)
+      groups.find(g => g.id === redoGroup.parent).hasChildren = true
+
+      this.setState({
+        groups,
+      })
+      return
+    }
   }
 
   /**
@@ -713,7 +776,7 @@ class PlanningTool extends Component {
     })
   }
 
-  addResource = (group, title) => {
+  addResource = (group, title, child) => {
     const {groups} = this.state
 
     const newId = Math.max(...groups.map(object => {
@@ -730,37 +793,51 @@ class PlanningTool extends Component {
       title: title,
     }
 
-    const groupIndex = this.getHighestGroupTreeIndex(group)
+    let groupIndex
+    if (child) {
+      groupIndex = this.state.groups.indexOf(group)
+      newGroup.parent = group.id
+      newGroup.level = group.level + 1
+      group.open = true
+      group.hasChildren = true
+    } else {
+      groupIndex = this.getHighestGroupTreeIndex(group)
+    }
     groups.splice(groupIndex + 1, 0, newGroup)
 
     this.setState({
       groups: groups,
       addResourceModal: false,
     })
+
+    this.addUndoItem(newGroup, 'resource-add')
   }
 
   renderAddResourceModal = (group) => {
     return (
       <Modal
-        title="Add resource"
-        onClose={this.closeAddResourceModal}
+        title={`Add resource - ${group.title}`}
+        onClose={() => {
+          this.setState({
+            addResourceModal: false,
+          })
+        }}
         onSubmit={() => {
-          this.addResource(group, this.addResourceInput.current.value)
-          this.addResourceInput.current.value = ''
+          this.addResource(group, this.addResourceRefs.name.current.value, this.addResourceRefs.child.current.checked)
+          this.addResourceRefs.name.current.value = ''
+          this.addResourceRefs.child.current.checked = false
         }}
       >
         <label>
           Insert resource name
-          <input type="text" placeholder="Resource name" ref={this.addResourceInput}/>
+          <input type="text" placeholder="Resource name" ref={this.addResourceRefs.name}/>
+        </label>
+        <label>
+          Do you want to create this resource as a child?
+          <input type="checkbox" placeholder="yes" ref={this.addResourceRefs.child}/>
         </label>
       </Modal>
     )
-  }
-
-  closeAddResourceModal = () => {
-    this.setState({
-      addResourceModal: false,
-    })
   }
 
   renderGroup = (group) => {

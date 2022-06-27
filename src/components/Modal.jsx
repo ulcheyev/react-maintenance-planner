@@ -4,7 +4,6 @@ import './../assets/Modal.css'
 
 export default class Modal extends React.Component {
   onSubmit = () => {
-    console.log(this.props)
     this.props.onSubmit()
   }
 
