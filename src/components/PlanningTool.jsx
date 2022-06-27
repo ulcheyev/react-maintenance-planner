@@ -1,6 +1,7 @@
 import React, {Component} from "react"
 import moment from "moment"
-import { HiOutlinePencil } from "react-icons/hi";
+import {HiOutlinePencil} from "react-icons/hi";
+import {FaPlus} from 'react-icons/fa'
 
 import Timeline, {
   TodayMarker,
@@ -11,6 +12,7 @@ import Xarrow from "react-xarrows"
 import './../assets/PlanningTool.css'
 import PropTypes from "prop-types"
 import Popup from './Popup'
+import Modal from './Modal'
 
 const keys = {
   groupIdKey: "id",
@@ -88,6 +90,9 @@ class PlanningTool extends Component {
     const showIcons = false
 
     this.timeline = React.createRef()
+    this.addResourceInput = React.createRef()
+
+    const addResourceModal = false
 
     this.state = {
       groups,
@@ -98,7 +103,8 @@ class PlanningTool extends Component {
       sidebarResizing,
       popup,
       milestones,
-      showIcons
+      showIcons,
+      addResourceModal,
     }
   }
 
@@ -463,20 +469,20 @@ class PlanningTool extends Component {
 
   renderPopup = (popup) => {
     return (
-        <>
-          {popup.open && (
-              popup.custom ?
-                  popup.custom({
-                    item: popup.item,
-                    group: popup.group,
-                  })
-                  :
-                  <Popup
-                      item={popup.item}
-                      group={popup.group}
-                  />
-          )}
-        </>
+      <>
+        {popup.open && (
+          popup.custom ?
+            popup.custom({
+              item: popup.item,
+              group: popup.group,
+            })
+            :
+            <Popup
+              item={popup.item}
+              group={popup.group}
+            />
+        )}
+      </>
     )
   }
 
@@ -505,31 +511,31 @@ class PlanningTool extends Component {
 
     return (
       <div
-          onMouseEnter={() => this.handleShowIconsOnMouseEnter(null, item.id)}
-          onMouseLeave={() => this.handleShowIconsOnMouseLeave(null, item.id)}
-          onKeyUp={(e) => this.handleInputFieldOnKeyUp(e, null, item.id)}
-          {...getItemProps({
-            style: {
-              background: backgroundColor,
-              color: color,
-              minWidth: 20,
-            },
-            /**
-             * Event handler when click on an item
-             */
-            onMouseDown: () => {
-              item.selected = true
-              this.removeHighlight()
-              this.highlightChildren(item)
-              this.showItemInfo(this.state.items.find(i => i.id === item.id))
-              this.setState({
-                items: this.state.items
-              })
-            },
+        onMouseEnter={() => this.handleShowIconsOnMouseEnter(null, item.id)}
+        onMouseLeave={() => this.handleShowIconsOnMouseLeave(null, item.id)}
+        onKeyUp={(e) => this.handleInputFieldOnKeyUp(e, null, item.id)}
+        {...getItemProps({
+          style: {
+            background: backgroundColor,
+            color: color,
+            minWidth: 20,
+          },
+          /**
+           * Event handler when click on an item
+           */
+          onMouseDown: () => {
+            item.selected = true
+            this.removeHighlight()
+            this.highlightChildren(item)
+            this.showItemInfo(this.state.items.find(i => i.id === item.id))
+            this.setState({
+              items: this.state.items
+            })
+          },
 
-          })}
-          id={'item-' + item.id}
-          className={item.canMove ? 'movable-item' : 'static-item'}
+        })}
+        id={'item-' + item.id}
+        className={item.canMove ? 'movable-item' : 'static-item'}
       >
         {/*left resize*/}
         {itemContext.selected && (item.canResize === 'both' || item.canResize === 'left') ?
@@ -557,8 +563,8 @@ class PlanningTool extends Component {
           {item.isEditMode ? this.renderEditMode(item.id) : itemContext.title}
           {item.showIcons &&
           <span
-              onClick={(e) => this.handleEditMode(e, null, item.id)}
-              className="edit-icon"><HiOutlinePencil/>
+            onClick={(e) => this.handleEditMode(e, null, item.id)}
+            className="edit-icon"><HiOutlinePencil/>
           </span>
           }
         </div>
@@ -677,7 +683,6 @@ class PlanningTool extends Component {
   }
 
   handleInputFieldOnKeyUp = (e, groupId, itemId) => {
-    console.log(itemId)
     if (e.key === 'Enter' && e.ctrlKey) {
       this.handleEditMode(e, groupId, itemId);
       this.handleInputFieldValue(e, groupId, itemId)
@@ -687,39 +692,108 @@ class PlanningTool extends Component {
 
   renderEditMode = () => {
     return (
-        <input
-            autoFocus
-            onClick={e => e.stopPropagation()}
-            placeholder="Ctrl+Enter / Escape" />
+      <input
+        autoFocus
+        onClick={e => e.stopPropagation()}
+        placeholder="Ctrl+Enter / Escape"/>
     )
+  }
+
+  getHighestGroupTreeIndex = (group) => {
+    if (!group.hasChildren) {
+      return this.state.groups.indexOf(group)
+    }
+
+    return this.getHighestGroupTreeIndex(this.state.groups.filter(g => g.parent === group.id).slice(-1)[0])
+  }
+
+  handleAddResource = (group) => {
+    this.setState({
+      addResourceModal: group
+    })
+  }
+
+  addResource = (group, title) => {
+    const {groups} = this.state
+
+    const newId = Math.max(...groups.map(object => {
+      return object.id
+    })) + 1
+
+    const newGroup = {
+      id: newId,
+      level: group.level,
+      open: false,
+      parent: group.parent,
+      show: true,
+      showIcons: false,
+      title: title,
+    }
+
+    const groupIndex = this.getHighestGroupTreeIndex(group)
+    groups.splice(groupIndex + 1, 0, newGroup)
+
+    this.setState({
+      groups: groups,
+      addResourceModal: false,
+    })
+  }
+
+  renderAddResourceModal = (group) => {
+    return (
+      <Modal
+        title="Add resource"
+        onClose={this.closeAddResourceModal}
+        onSubmit={() => {
+          this.addResource(group, this.addResourceInput.current.value)
+          this.addResourceInput.current.value = ''
+        }}
+      >
+        <label>
+          Insert resource name
+          <input type="text" placeholder="Resource name" ref={this.addResourceInput}/>
+        </label>
+      </Modal>
+    )
+  }
+
+  closeAddResourceModal = () => {
+    this.setState({
+      addResourceModal: false,
+    })
   }
 
   renderGroup = (group) => {
     return (
+      <div className='resource-group'>
         <div
-            className="resource"
-            onClick={() => this.toggleGroup(group.id)}
-            style={{cursor: 'pointer'}}
+          className="resource"
+          onClick={() => this.toggleGroup(group.id)}
+          style={{cursor: 'pointer', paddingLeft: group.level * 20}}
         >
           {
             group.hasChildren ?
-                group.isEditMode ?
-                    group.open ? "[-] "
-                        : "[+] "
-                    : group.open ? `[-] ${group.title} `
-                        : `[+] ${group.title} `
-                : group.isEditMode ? ""
-                    : group.title
+              group.isEditMode ?
+                group.open ? "[-] "
+                  : "[+] "
+                : group.open ? `[-] ${group.title} `
+                  : `[+] ${group.title} `
+              : group.isEditMode ? ""
+                : group.title
           }
 
           {group.isEditMode && this.renderEditMode(group.id)}
           {group.showIcons &&
           <div
-              onClick={(e) => this.handleEditMode(e, group.id)}
-              className="edit-icon"><HiOutlinePencil/>
+            onClick={(e) => this.handleEditMode(e, group.id)}
+            className="edit-icon"><HiOutlinePencil/>
           </div>
           }
         </div>
+        {group.showIcons &&
+        <FaPlus className="add-resource" onClick={() => this.handleAddResource(group)}/>
+        }
+      </div>
     )
   }
 
@@ -733,15 +807,13 @@ class PlanningTool extends Component {
     const newGroups = groups.filter((g) => g.show).map((group) => {
       return Object.assign({}, group, {
         title:
-            <div
-                onMouseEnter={() => this.handleShowIconsOnMouseEnter(group.id)}
-                onMouseLeave={() => this.handleShowIconsOnMouseLeave(group.id)}
-                onKeyUp={(e) => this.handleInputFieldOnKeyUp(e, group.id)}
-                style={{paddingLeft: group.level * 20}}
-
-            >
-              {this.renderGroup(group)}
-            </div>
+          <div
+            onMouseEnter={() => this.handleShowIconsOnMouseEnter(group.id)}
+            onMouseLeave={() => this.handleShowIconsOnMouseLeave(group.id)}
+            onKeyUp={(e) => this.handleInputFieldOnKeyUp(e, group.id)}
+          >
+            {this.renderGroup(group)}
+          </div>
       })
     })
 
@@ -749,31 +821,31 @@ class PlanningTool extends Component {
       <>
         <div className="timeline-container">
           <Timeline className="timeline"
-            ref={this.timeline}
-            groups={newGroups}
-            items={items}
-            keys={keys}
-            fullUpdate
-            itemTouchSendsClick={false}
-            stackItems
-            itemHeightRatio={0.75}
-            canMove={true}
-            canResize={"both"}
-            sidebarWidth={sidebarWidth}
-            defaultTimeStart={defaultTimeStart}
-            defaultTimeEnd={defaultTimeEnd}
-            onTimeChange={this.onTimeChange}
-            itemRenderer={this.itemRenderer}
-            onItemMove={this.handleItemMove}
-            onItemResize={this.handleItemResize}
-            onItemDeselect={this.itemDeselected}
-            onItemDrag={this.handleItemDrag}
-            handleSidebarResize={{
-              down: this.onSidebarDown,
-              move: this.onSidebarMove,
-              up: this.onSidebarUp,
-              resizing: this.state.sidebarResizing,
-            }}
+                    ref={this.timeline}
+                    groups={newGroups}
+                    items={items}
+                    keys={keys}
+                    fullUpdate
+                    itemTouchSendsClick={false}
+                    stackItems
+                    itemHeightRatio={0.75}
+                    canMove={true}
+                    canResize={"both"}
+                    sidebarWidth={sidebarWidth}
+                    defaultTimeStart={defaultTimeStart}
+                    defaultTimeEnd={defaultTimeEnd}
+                    onTimeChange={this.onTimeChange}
+                    itemRenderer={this.itemRenderer}
+                    onItemMove={this.handleItemMove}
+                    onItemResize={this.handleItemResize}
+                    onItemDeselect={this.itemDeselected}
+                    onItemDrag={this.handleItemDrag}
+                    handleSidebarResize={{
+                      down: this.onSidebarDown,
+                      move: this.onSidebarMove,
+                      up: this.onSidebarUp,
+                      resizing: this.state.sidebarResizing,
+                    }}
           >
             {/*current time marker*/}
             <TodayMarker interval={1000}/>
@@ -836,10 +908,14 @@ class PlanningTool extends Component {
           </div>
         </div>
 
+        {this.state.addResourceModal &&
+        this.renderAddResourceModal(this.state.addResourceModal)
+        }
+
         {/*<div onClick={() => this.focusItems(items.filter(item => (item.id === 8 || item.id === 10)))}>
           focus
         </div>*/}
-        </>
+      </>
     )
   }
 }

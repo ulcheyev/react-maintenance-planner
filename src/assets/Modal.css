@@ -1,0 +1,77 @@
+.modal {
+  position: fixed;
+  width: 400px;
+  margin: 0 auto;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  background: #c3c3c3;
+  -webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0, 0, 0, 0);
+  box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0, 0, 0, 0);
+  z-index: 1000;
+  padding: 25px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.close {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  transform: rotate(45deg);
+  cursor: pointer;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  font-size: 1.125rem;
+}
+
+input {
+  padding: 5px 10px;
+}
+
+.submit {
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #333;
+  color: #333;
+  font-family: "Roboto", sans-serif;
+  font-size: 1rem;
+  transition-duration: .5s;
+  margin-top: 10px;
+  cursor: pointer;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none;
+}
+
+.submit:hover {
+  background-color: #333;
+  color: #fff;
+}
