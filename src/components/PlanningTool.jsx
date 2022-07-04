@@ -428,6 +428,19 @@ class PlanningTool extends Component {
       })
       return
     }
+    if (undoAction.actionName === 'resource-edit') {
+      const undoGroup = undoAction.item
+      this.addRedoItem(groups.find(g => g.id === undoGroup.id), undoAction.actionName)
+
+      this.setState({
+        groups: groups.map(group =>
+          group.id === undoGroup.id
+            ? Object.assign({}, undoGroup)
+            : group
+        )
+      })
+      return
+    }
     if (undoAction.actionName === 'resource-add') {
       const undoGroup = undoAction.item
 
@@ -451,6 +464,24 @@ class PlanningTool extends Component {
       })
       return
     }
+    if (undoAction.actionName === 'resource-remove') {
+      const undoGroup = undoAction.item
+      this.addRedoItem(undoGroup, undoAction.actionName)
+
+      let index = undoAction.params.index
+      groups.splice(index, 0, undoGroup)
+
+      for (const child of undoAction.params.children) {
+        groups.splice(++index, 0, child)
+      }
+
+      groups.find(g => g.id === undoGroup.parent).hasChildren = true
+
+      this.setState({
+        groups,
+      })
+      return
+    }
   }
 
   /**
@@ -462,7 +493,6 @@ class PlanningTool extends Component {
     }
     const {items, groups} = this.state
 
-    console.log(this.redoActions)
     const redoAction = this.redoActions.pop()
 
     if (redoAction.actionName === 'item-edit') {
@@ -479,6 +509,19 @@ class PlanningTool extends Component {
       })
       return
     }
+    if (redoAction.actionName === 'resource-edit') {
+      const redoGroup = redoAction.item
+      this.addUndoItem(groups.find(g => g.id === redoGroup.id), redoAction.actionName)
+
+      this.setState({
+        groups: groups.map(group =>
+          group.id === redoGroup.id
+            ? Object.assign({}, redoGroup)
+            : group
+        )
+      })
+      return
+    }
     if (redoAction.actionName === 'resource-add') {
       const redoGroup = redoAction.item
       this.addUndoItem(redoGroup, redoAction.actionName)
@@ -491,6 +534,32 @@ class PlanningTool extends Component {
       })
       return
     }
+    if (redoAction.actionName === 'resource-remove') {
+      const redoGroup = redoAction.item
+
+      this.removeResource(redoGroup)
+
+      return
+    }
+
+    /*if (undoAction.actionName === 'resource-remove') {
+      const undoGroup = undoAction.item
+      this.addRedoItem(undoGroup, undoAction.actionName)
+
+      let index = undoAction.params.index
+      groups.splice(index, 0, undoGroup)
+
+      for (const child of undoAction.params.children) {
+        groups.splice(++index, 0, child)
+      }
+
+      groups.find(g => g.id === undoGroup.parent).hasChildren = true
+
+      this.setState({
+        groups,
+      })
+      return
+    }*/
   }
 
   /**
@@ -625,10 +694,15 @@ class PlanningTool extends Component {
         >
           {item.isEditMode ? this.renderEditMode(item.id) : itemContext.title}
           {item.showIcons &&
+          <div className="action-icons">
           <span
             onClick={(e) => this.handleEditMode(e, null, item.id)}
             className="edit-icon"><HiOutlinePencil/>
           </span>
+            <span className="remove-icon">
+              <FaPlus/>
+            </span>
+          </div>
           }
         </div>
 
@@ -657,6 +731,53 @@ class PlanningTool extends Component {
           }}/> : ''}
       </div>
     )
+  }
+
+  handleRemoveResource = (e, group) => {
+    e.stopPropagation()
+
+    if (window.confirm(`Do you really want to remove resource ${group.title}?`) === true) {
+      this.removeResource(group, true)
+    }
+  }
+
+  removeResource = (group, removeRedos = false) => {
+    const {groups} = this.state
+
+    const index = groups.indexOf(group)
+    if (index > -1) {
+      const children = this.getAllChildren(group)
+      this.addUndoItem(group, 'resource-remove', {index, children}, removeRedos)
+
+      const parent = groups.find(g => g.id === group.parent)
+      groups.splice(index, 1)
+
+      for (const child of children) {
+        const index = groups.indexOf(child)
+
+        if (index > -1) {
+          groups.splice(index, 1)
+        }
+      }
+
+      if (groups.filter(g => g.parent === parent.id).length <= 0) {
+        parent.hasChildren = false
+      }
+    }
+
+    this.setState({
+      groups,
+    })
+  }
+
+  getAllChildren = (group) => {
+    let children = this.state.groups.filter(g => g.parent === group.id)
+
+    for (const child of children) {
+      children = children.concat(this.getAllChildren(child))
+    }
+
+    return children
   }
 
   handleShowIconsOnMouseEnter = (groupId, itemId) => {
@@ -735,12 +856,13 @@ class PlanningTool extends Component {
 
     if (groupId) {
       const group = groups.find(g => g.id === groupId)
+      this.addUndoItem(group, 'resource-edit', {}, true)
       group.title = e.target.value
     }
 
     if (itemId) {
-      console.log(itemId)
       const item = items.find(g => g.id === itemId)
+      this.addUndoItem(item, 'item-edit', {}, true)
       item.title = e.target.value
     }
   }
@@ -860,10 +982,18 @@ class PlanningTool extends Component {
           }
 
           {group.isEditMode && this.renderEditMode(group.id)}
-          {group.showIcons &&
-          <div
+          {(group.showIcons || true) &&
+          <div className="action-icons">
+          <span
             onClick={(e) => this.handleEditMode(e, group.id)}
             className="edit-icon"><HiOutlinePencil/>
+          </span>
+            <span
+              className="remove-icon"
+              onClick={(e) => this.handleRemoveResource(e, group)}
+            >
+              <FaPlus/>
+            </span>
           </div>
           }
         </div>

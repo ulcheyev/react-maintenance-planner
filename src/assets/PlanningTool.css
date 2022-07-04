@@ -210,3 +210,13 @@
 .react-calendar-timeline .rct-sidebar{
   overflow: visible;
 }
+
+.action-icons {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.action-icons .remove-icon {
+  transform: rotate(45deg);
+}
