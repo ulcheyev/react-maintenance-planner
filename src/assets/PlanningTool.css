@@ -207,7 +207,7 @@
   overflow: visible;
 }
 
-.react-calendar-timeline .rct-sidebar{
+.react-calendar-timeline .rct-sidebar {
   overflow: visible;
 }
 
@@ -215,8 +215,22 @@
   display: inline-flex;
   align-items: center;
   gap: 2px;
+  width: 100%;
+  padding: 0 5px;
 }
 
 .action-icons .remove-icon {
   transform: rotate(45deg);
+}
+
+.action-icons .reorder-icons {
+  display: inline-flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+  gap: 2px;
+}
+
+.order-icon.disabled svg{
+  fill: #c3c3c3;
 }

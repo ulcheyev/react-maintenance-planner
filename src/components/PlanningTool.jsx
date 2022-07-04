@@ -1,7 +1,7 @@
 import React, {Component} from "react"
 import moment from "moment"
 import {HiOutlinePencil} from "react-icons/hi";
-import {FaPlus} from 'react-icons/fa'
+import {FaPlus, FaArrowUp, FaArrowDown} from 'react-icons/fa'
 
 import Timeline, {
   TodayMarker,
@@ -482,6 +482,15 @@ class PlanningTool extends Component {
       })
       return
     }
+    if (undoAction.actionName === 'resource-reorder') {
+      const undoGroup = undoAction.item
+      const direction = undoAction.params.direction
+      this.addRedoItem(undoGroup, undoAction.actionName, {direction})
+
+      this.handleReorderResource(null, groups.find(g => g.id === undoGroup.id), direction === 'up' ? 'down' : 'up', false)
+
+      return
+    }
   }
 
   /**
@@ -541,25 +550,15 @@ class PlanningTool extends Component {
 
       return
     }
+    if (redoAction.actionName === 'resource-reorder') {
+      const redoGroup = redoAction.item
+      const direction = redoAction.params.direction
+      this.addUndoItem(redoGroup, redoAction.actionName, {direction})
 
-    /*if (undoAction.actionName === 'resource-remove') {
-      const undoGroup = undoAction.item
-      this.addRedoItem(undoGroup, undoAction.actionName)
+      this.handleReorderResource(null, groups.find(g => g.id === redoGroup.id), direction, false)
 
-      let index = undoAction.params.index
-      groups.splice(index, 0, undoGroup)
-
-      for (const child of undoAction.params.children) {
-        groups.splice(++index, 0, child)
-      }
-
-      groups.find(g => g.id === undoGroup.parent).hasChildren = true
-
-      this.setState({
-        groups,
-      })
       return
-    }*/
+    }
   }
 
   /**
@@ -773,8 +772,8 @@ class PlanningTool extends Component {
   getAllChildren = (group) => {
     let children = this.state.groups.filter(g => g.parent === group.id)
 
-    for (const child of children) {
-      children = children.concat(this.getAllChildren(child))
+    for (const child of children.slice()) {
+      children.splice(children.indexOf(child) + 1, 0, ...this.getAllChildren(child))
     }
 
     return children
@@ -962,7 +961,113 @@ class PlanningTool extends Component {
     )
   }
 
+  handleReorderResource = (e, group, direction, addUndo = true) => {
+    if (e) {
+      e.stopPropagation()
+    }
+
+    const siblings = this.getSiblings(group)
+    let {groups} = this.state
+    if (siblings.length <= 0) {
+      return
+    }
+
+    const siblingsIndex = siblings.indexOf(group)
+    if (siblingsIndex < 0) {
+      return
+    }
+    const groupsIndex = groups.indexOf(group)
+    if (groupsIndex < 0) {
+      return
+    }
+
+    if (direction === 'up') {
+      if (siblingsIndex === 0) {
+        return
+      }
+
+      if (addUndo) {
+        this.addUndoItem(group, 'resource-reorder', {direction}, true)
+      }
+      const siblingToSwapGroupsIndex = groups.indexOf(siblings[siblingsIndex - 1])
+
+      const upperArray = groups.slice(0, groupsIndex)
+      const lowerArray = groups.slice(groupsIndex)
+      const onlySiblingArray = upperArray.splice(siblingToSwapGroupsIndex)
+      let nextSiblingIndex = lowerArray.indexOf(siblings[siblingsIndex + 1])
+      if (nextSiblingIndex < 0) {
+        const children = this.getAllChildren(group)
+        if (children.length > 0) {
+          nextSiblingIndex = lowerArray.indexOf(children[children.length - 1]) + 1
+        } else {
+          nextSiblingIndex = 1
+        }
+      }
+      const onlyGroupArray = lowerArray.splice(0, nextSiblingIndex)
+
+      groups = [
+        ...upperArray,
+        ...onlyGroupArray,
+        ...onlySiblingArray,
+        ...lowerArray,
+      ]
+    } else if (direction === 'down') {
+      if (siblingsIndex === siblings.length - 1) {
+        return
+      }
+
+      if (addUndo) {
+        this.addUndoItem(group, 'resource-reorder', {direction}, true)
+      }
+      const siblingToSwapGroupsIndex = groups.indexOf(siblings[siblingsIndex + 1])
+
+      const upperArray = groups.slice(0, siblingToSwapGroupsIndex)
+      const lowerArray = groups.slice(siblingToSwapGroupsIndex)
+      const onlyGroupArray = upperArray.splice(groupsIndex)
+      let nextSiblingIndex = lowerArray.indexOf(siblings[siblingToSwapGroupsIndex + 1])
+      if (nextSiblingIndex < 0) {
+        const children = this.getAllChildren(groups[siblingToSwapGroupsIndex])
+        if (children.length > 0) {
+          nextSiblingIndex = lowerArray.indexOf(children[children.length - 1]) + 1
+        } else {
+          nextSiblingIndex = 1
+        }
+      }
+      const onlySiblingArray = lowerArray.splice(0, nextSiblingIndex)
+
+      groups = [
+        ...upperArray,
+        ...onlySiblingArray,
+        ...onlyGroupArray,
+        ...lowerArray,
+      ]
+    } else {
+      return
+    }
+
+    group.showIcons = false
+    this.setState({
+      groups,
+    })
+  }
+
+  getSiblings = (group) => {
+    return this.state.groups.filter(g => g.parent === group.parent)
+  }
+
   renderGroup = (group) => {
+    const siblings = this.getSiblings(group)
+    let ordering = false, orderDown = true, orderUp = true
+    if (siblings.length > 1) {
+      ordering = true
+      if (siblings[0] === group) {
+        orderUp = false
+      }
+      if (siblings[siblings.length - 1] === group) {
+        orderDown = false
+      }
+    }
+
     return (
       <div className='resource-group'>
         <div
@@ -982,7 +1087,7 @@ class PlanningTool extends Component {
           }
 
           {group.isEditMode && this.renderEditMode(group.id)}
-          {(group.showIcons || true) &&
+          {group.showIcons &&
           <div className="action-icons">
           <span
             onClick={(e) => this.handleEditMode(e, group.id)}
@@ -994,6 +1099,18 @@ class PlanningTool extends Component {
             >
               <FaPlus/>
             </span>
+            <div className="reorder-icons">
+              <span
+                onClick={(e) => this.handleReorderResource(e, group, 'up')}
+                className={`order-up-icon order-icon ${ordering && orderUp ? '' : 'disabled'}`}>
+                <FaArrowUp/>
+              </span>
+              <span
+                onClick={(e) => this.handleReorderResource(e, group, 'down')}
+                className={`order-down-icon order-icon ${ordering && orderDown ? '' : 'disabled'}`}>
+                <FaArrowDown/>
+              </span>
+            </div>
           </div>
           }
         </div>
