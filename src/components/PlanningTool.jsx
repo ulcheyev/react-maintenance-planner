@@ -268,6 +268,14 @@ class PlanningTool extends Component {
     }
   }
 
+  highlightParents = (item) => {
+    if (item.parent) {
+      const parent = this.state.items.find(i => i.id === item.parent)
+      parent.highlight = true
+      this.highlightParents(parent)
+    }
+  }
+
   /**
    * Turns off highlighting of every item
    */
@@ -521,6 +529,7 @@ class PlanningTool extends Component {
               item.selected = true
               this.removeHighlight()
               this.highlightChildren(item)
+              this.highlightParents(item)
               this.showItemInfo(this.state.items.find(i => i.id === item.id))
               this.setState({
                 items: this.state.items
