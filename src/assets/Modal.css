@@ -19,12 +19,12 @@
   margin-bottom: 20px;
 }
 
-.title {
+.modal-title {
   font-size: 1.25rem;
   font-weight: bold;
 }
 
-.close {
+.modal-close {
   position: absolute;
   top: 5px;
   right: 5px;
@@ -53,7 +53,7 @@ input {
   padding: 5px 10px;
 }
 
-.submit {
+.modal-submit {
   padding: 10px;
   background-color: #fff;
   border: 1px solid #333;
@@ -71,7 +71,7 @@ input {
   user-select: none;
 }
 
-.submit:hover {
+.modal-submit:hover {
   background-color: #333;
   color: #fff;
 }

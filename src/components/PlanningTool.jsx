@@ -13,6 +13,8 @@ import './../assets/PlanningTool.css'
 import PropTypes from "prop-types"
 import Popup from './Popup'
 import Modal from './Modal'
+import Constants from '../constants/Constants'
+import {actions} from "@storybook/addon-actions";
 
 const keys = {
   groupIdKey: "id",
@@ -120,7 +122,7 @@ class PlanningTool extends Component {
 
     const group = groups.filter(g => g.show)[newGroupOrder]
 
-    this.addUndoItem(items.find(i => i.id === itemId), 'item-edit', {}, true)
+    this.addUndoItem(items.find(i => i.id === itemId), Constants.ITEM_EDIT, {}, true)
 
     this.setState({
       items: items.map(item =>
@@ -144,7 +146,7 @@ class PlanningTool extends Component {
 
     const item = items.find(item => item.id === itemId)
 
-    this.addUndoItem(item, 'item-edit', {}, true)
+    this.addUndoItem(item, Constants.ITEM_EDIT, {}, true)
 
     let start = moment(edge === "left" ? time : item.start)
     let end = moment(edge === "left" ? item.end : time)
@@ -410,87 +412,113 @@ class PlanningTool extends Component {
     if (this.actions.length <= 0) {
       return
     }
-    const {items, groups} = this.state
 
     const undoAction = this.actions.pop()
 
-    if (undoAction.actionName === 'item-edit') {
-      const undoItem = undoAction.item
-      this.addRedoItem(items.find(i => i.id === undoItem.id), undoAction.actionName)
+    if (undoAction.actionName === Constants.ITEM_EDIT) {
+      this.undoItemEdit(undoAction)
+      return
+    }
+    if (undoAction.actionName === Constants.RESOURCE_EDIT) {
+      this.undoResourceEdit(undoAction)
+      return
+    }
+    if (undoAction.actionName === Constants.RESOURCE_ADD) {
+      this.undoResourceAdd(undoAction)
+      return
+    }
+    if (undoAction.actionName === Constants.RESOURCE_REMOVE) {
+      this.undoResourceRemove(undoAction)
+      return
+    }
+    if (undoAction.actionName === Constants.RESOURCE_REORDER) {
+      this.undoResourceReorder(undoAction)
+      return
+    }
+  }
 
-      this.setState({
-        items: items.map(item =>
-          item.id === undoItem.id
-            ? Object.assign({}, undoItem)
-            : item
-        ),
-        draggedItem: undefined
+  undoResourceRemove = (undoAction) => {
+    const {groups} = this.state
+    const undoGroup = undoAction.item
+    this.addRedoItem(undoGroup, undoAction.actionName)
+
+    let index = undoAction.params.index
+    groups.splice(index, 0, undoGroup)
+
+    for (const child of undoAction.params.children) {
+      groups.splice(++index, 0, child)
+    }
+
+    groups.find(g => g.id === undoGroup.parent).hasChildren = true
+
+    this.setState({
+      groups,
+    })
+  }
+
+  undoResourceReorder = (undoAction) => {
+    const {groups} = this.state
+
+    const undoGroup = undoAction.item
+    const direction = undoAction.params.direction
+    this.addRedoItem(undoGroup, undoAction.actionName, {direction})
+
+    this.handleReorderResource(null, groups.find(g => g.id === undoGroup.id), direction === 'up' ? 'down' : 'up', false)
+  }
+
+  undoResourceAdd = (undoAction) => {
+    const {groups} = this.state
+    const undoGroup = undoAction.item
+
+    const group = groups.find(g => g.id === undoGroup.id)
+    const parent = groups.find(p => p.id === group.parent)
+    const index = groups.indexOf(group)
+
+    if (index > -1) {
+      groups.splice(index, 1)
+      this.addRedoItem(group, undoAction.actionName, {
+        index,
       })
-      return
     }
-    if (undoAction.actionName === 'resource-edit') {
-      const undoGroup = undoAction.item
-      this.addRedoItem(groups.find(g => g.id === undoGroup.id), undoAction.actionName)
 
-      this.setState({
-        groups: groups.map(group =>
-          group.id === undoGroup.id
-            ? Object.assign({}, undoGroup)
-            : group
-        )
-      })
-      return
+    if (groups.filter(g => g.parent === parent.id).length <= 0) {
+      parent.hasChildren = false
     }
-    if (undoAction.actionName === 'resource-add') {
-      const undoGroup = undoAction.item
 
-      const group = groups.find(g => g.id === undoGroup.id)
-      const parent = groups.find(p => p.id === group.parent)
-      const index = groups.indexOf(group)
+    this.setState({
+      groups,
+    })
+  }
 
-      if (index > -1) {
-        groups.splice(index, 1)
-        this.addRedoItem(group, undoAction.actionName, {
-          index,
-        })
-      }
+  undoResourceEdit = (undoAction) => {
+    const {groups} = this.state
+    const undoGroup = undoAction.item
 
-      if (groups.filter(g => g.parent === parent.id).length <= 0) {
-        parent.hasChildren = false
-      }
+    this.addRedoItem(groups.find(g => g.id === undoGroup.id), undoAction.actionName)
 
-      this.setState({
-        groups,
-      })
-      return
-    }
-    if (undoAction.actionName === 'resource-remove') {
-      const undoGroup = undoAction.item
-      this.addRedoItem(undoGroup, undoAction.actionName)
+    this.setState({
+      groups: groups.map(group =>
+        group.id === undoGroup.id
+          ? Object.assign({}, undoGroup)
+          : group
+      )
+    })
+  }
 
-      let index = undoAction.params.index
-      groups.splice(index, 0, undoGroup)
+  undoItemEdit = (undoAction) => {
+    const {items} = this.state
+    const undoItem = undoAction.item
 
-      for (const child of undoAction.params.children) {
-        groups.splice(++index, 0, child)
-      }
+    this.addRedoItem(items.find(i => i.id === undoItem.id), undoAction.actionName)
 
-      groups.find(g => g.id === undoGroup.parent).hasChildren = true
-
-      this.setState({
-        groups,
-      })
-      return
-    }
-    if (undoAction.actionName === 'resource-reorder') {
-      const undoGroup = undoAction.item
-      const direction = undoAction.params.direction
-      this.addRedoItem(undoGroup, undoAction.actionName, {direction})
-
-      this.handleReorderResource(null, groups.find(g => g.id === undoGroup.id), direction === 'up' ? 'down' : 'up', false)
-
-      return
-    }
+    this.setState({
+      items: items.map(item =>
+        item.id === undoItem.id
+          ? Object.assign({}, undoItem)
+          : item
+      ),
+      draggedItem: undefined
+    })
   }
 
   /**
@@ -500,65 +528,86 @@ class PlanningTool extends Component {
     if (this.redoActions.length <= 0) {
       return
     }
-    const {items, groups} = this.state
 
     const redoAction = this.redoActions.pop()
 
-    if (redoAction.actionName === 'item-edit') {
-      const redoItem = redoAction.item
-      this.addUndoItem(items.find(i => i.id === redoItem.id), redoAction.actionName)
-
-      this.setState({
-        items: items.map(item =>
-          item.id === redoItem.id
-            ? Object.assign({}, redoItem)
-            : item
-        ),
-        draggedItem: undefined
-      })
+    if (redoAction.actionName === Constants.ITEM_EDIT) {
+      this.redoItemEdit(redoAction)
       return
     }
-    if (redoAction.actionName === 'resource-edit') {
-      const redoGroup = redoAction.item
-      this.addUndoItem(groups.find(g => g.id === redoGroup.id), redoAction.actionName)
-
-      this.setState({
-        groups: groups.map(group =>
-          group.id === redoGroup.id
-            ? Object.assign({}, redoGroup)
-            : group
-        )
-      })
+    if (redoAction.actionName === Constants.RESOURCE_EDIT) {
+      this.redoResourceEdit(redoAction)
       return
     }
-    if (redoAction.actionName === 'resource-add') {
-      const redoGroup = redoAction.item
-      this.addUndoItem(redoGroup, redoAction.actionName)
-
-      groups.splice(redoAction.params.index, 0, redoGroup)
-      groups.find(g => g.id === redoGroup.parent).hasChildren = true
-
-      this.setState({
-        groups,
-      })
+    if (redoAction.actionName === Constants.RESOURCE_ADD) {
+      this.redoResourceAdd(redoAction)
       return
     }
-    if (redoAction.actionName === 'resource-remove') {
-      const redoGroup = redoAction.item
-
-      this.removeResource(redoGroup)
-
+    if (redoAction.actionName === Constants.RESOURCE_REMOVE) {
+      this.redoResourceRemove(redoAction)
       return
     }
-    if (redoAction.actionName === 'resource-reorder') {
-      const redoGroup = redoAction.item
-      const direction = redoAction.params.direction
-      this.addUndoItem(redoGroup, redoAction.actionName, {direction})
-
-      this.handleReorderResource(null, groups.find(g => g.id === redoGroup.id), direction, false)
-
+    if (redoAction.actionName === Constants.RESOURCE_REORDER) {
+      this.redoResourceReorder(redoAction)
       return
     }
+  }
+
+  redoItemEdit = (redoAction) => {
+    const {items} = this.state
+    const redoItem = redoAction.item
+    this.addUndoItem(items.find(i => i.id === redoItem.id), redoAction.actionName)
+
+    this.setState({
+      items: items.map(item =>
+        item.id === redoItem.id
+          ? Object.assign({}, redoItem)
+          : item
+      ),
+      draggedItem: undefined
+    })
+  }
+
+  redoResourceEdit = (redoAction) => {
+    const {groups} = this.state
+    const redoGroup = redoAction.item
+    this.addUndoItem(groups.find(g => g.id === redoGroup.id), redoAction.actionName)
+
+    this.setState({
+      groups: groups.map(group =>
+        group.id === redoGroup.id
+          ? Object.assign({}, redoGroup)
+          : group
+      )
+    })
+  }
+
+  redoResourceAdd = (redoAction) => {
+    const {groups} = this.state
+    const redoGroup = redoAction.item
+    this.addUndoItem(redoGroup, redoAction.actionName)
+
+    groups.splice(redoAction.params.index, 0, redoGroup)
+    groups.find(g => g.id === redoGroup.parent).hasChildren = true
+
+    this.setState({
+      groups,
+    })
+  }
+
+  redoResourceRemove = (redoAction) => {
+    const redoGroup = redoAction.item
+    this.removeResource(redoGroup)
+  }
+
+  redoResourceReorder = (redoAction) => {
+    const {groups} = this.state
+
+    const redoGroup = redoAction.item
+    const direction = redoAction.params.direction
+    this.addUndoItem(redoGroup, redoAction.actionName, {direction})
+
+    this.handleReorderResource(null, groups.find(g => g.id === redoGroup.id), direction, false)
   }
 
   /**
@@ -693,15 +742,15 @@ class PlanningTool extends Component {
         >
           {item.isEditMode ? this.renderEditMode(item.id) : itemContext.title}
           {item.showIcons &&
-          <div className="action-icons">
+            <div className="action-icons">
           <span
             onClick={(e) => this.handleEditMode(e, null, item.id)}
             className="edit-icon"><HiOutlinePencil/>
           </span>
-            <span className="remove-icon">
+              <span className="remove-icon">
               <FaPlus/>
             </span>
-          </div>
+            </div>
           }
         </div>
 
@@ -746,7 +795,7 @@ class PlanningTool extends Component {
     const index = groups.indexOf(group)
     if (index > -1) {
       const children = this.getAllChildren(group)
-      this.addUndoItem(group, 'resource-remove', {index, children}, removeRedos)
+      this.addUndoItem(group, Constants.RESOURCE_REMOVE, {index, children}, removeRedos)
 
       const parent = groups.find(g => g.id === group.parent)
       groups.splice(index, 1)
@@ -855,13 +904,13 @@ class PlanningTool extends Component {
 
     if (groupId) {
       const group = groups.find(g => g.id === groupId)
-      this.addUndoItem(group, 'resource-edit', {}, true)
+      this.addUndoItem(group, Constants.RESOURCE_EDIT, {}, true)
       group.title = e.target.value
     }
 
     if (itemId) {
       const item = items.find(g => g.id === itemId)
-      this.addUndoItem(item, 'item-edit', {}, true)
+      this.addUndoItem(item, Constants.ITEM_EDIT, {}, true)
       item.title = e.target.value
     }
   }
@@ -931,7 +980,7 @@ class PlanningTool extends Component {
       addResourceModal: false,
     })
 
-    this.addUndoItem(newGroup, 'resource-add')
+    this.addUndoItem(newGroup, Constants.RESOURCE_ADD)
   }
 
   renderAddResourceModal = (group) => {
@@ -987,7 +1036,7 @@ class PlanningTool extends Component {
       }
 
       if (addUndo) {
-        this.addUndoItem(group, 'resource-reorder', {direction}, true)
+        this.addUndoItem(group, Constants.RESOURCE_REORDER, {direction}, true)
       }
       const siblingToSwapGroupsIndex = groups.indexOf(siblings[siblingsIndex - 1])
 
@@ -1017,7 +1066,7 @@ class PlanningTool extends Component {
       }
 
       if (addUndo) {
-        this.addUndoItem(group, 'resource-reorder', {direction}, true)
+        this.addUndoItem(group, Constants.RESOURCE_REORDER, {direction}, true)
       }
       const siblingToSwapGroupsIndex = groups.indexOf(siblings[siblingsIndex + 1])
 
@@ -1088,34 +1137,34 @@ class PlanningTool extends Component {
 
           {group.isEditMode && this.renderEditMode(group.id)}
           {group.showIcons &&
-          <div className="action-icons">
+            <div className="action-icons">
           <span
             onClick={(e) => this.handleEditMode(e, group.id)}
             className="edit-icon"><HiOutlinePencil/>
           </span>
-            <span
-              className="remove-icon"
-              onClick={(e) => this.handleRemoveResource(e, group)}
-            >
+              <span
+                className="remove-icon"
+                onClick={(e) => this.handleRemoveResource(e, group)}
+              >
               <FaPlus/>
             </span>
-            <div className="reorder-icons">
+              <div className="reorder-icons">
               <span
                 onClick={(e) => this.handleReorderResource(e, group, 'up')}
                 className={`order-up-icon order-icon ${ordering && orderUp ? '' : 'disabled'}`}>
                 <FaArrowUp/>
               </span>
-              <span
-                onClick={(e) => this.handleReorderResource(e, group, 'down')}
-                className={`order-down-icon order-icon ${ordering && orderDown ? '' : 'disabled'}`}>
+                <span
+                  onClick={(e) => this.handleReorderResource(e, group, 'down')}
+                  className={`order-down-icon order-icon ${ordering && orderDown ? '' : 'disabled'}`}>
                 <FaArrowDown/>
               </span>
+              </div>
             </div>
-          </div>
           }
         </div>
         {group.showIcons &&
-        <FaPlus className="add-resource" onClick={() => this.handleAddResource(group)}/>
+          <FaPlus className="add-resource" onClick={() => this.handleAddResource(group)}/>
         }
       </div>
     )
@@ -1233,7 +1282,7 @@ class PlanningTool extends Component {
         </div>
 
         {this.state.addResourceModal &&
-        this.renderAddResourceModal(this.state.addResourceModal)
+          this.renderAddResourceModal(this.state.addResourceModal)
         }
 
         {/*<div onClick={() => this.focusItems(items.filter(item => (item.id === 8 || item.id === 10)))}>
