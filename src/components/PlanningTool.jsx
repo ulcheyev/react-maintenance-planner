@@ -106,6 +106,7 @@ class PlanningTool extends Component {
       defaultTimeEnd,
       sidebarWidth,
       sidebarResizing,
+      lastSidebarWidth: sidebarWidth,
       popup,
       milestones,
       showIcons,
@@ -1104,6 +1105,31 @@ class PlanningTool extends Component {
     return this.state.groups.filter(g => g.parent === group.parent)
   }
 
+  groupOnEnter = (target) => {
+    if (this.state.sidebarResizing || !target) {
+      return
+    }
+
+    let width = this.state.sidebarWidth
+    if (target.scrollWidth > this.state.sidebarWidth) {
+      width = target.scrollWidth + 10
+    }
+    this.setState({
+      lastSidebarWidth: this.state.sidebarWidth,
+      sidebarWidth: width,
+    })
+  }
+
+  groupOnLeave = () => {
+    if (this.state.sidebarResizing) {
+      return
+    }
+
+    this.setState({
+      sidebarWidth: this.state.lastSidebarWidth
+    })
+  }
+
   renderGroup = (group) => {
     const siblings = this.getSiblings(group)
     let ordering = false, orderDown = true, orderUp = true
@@ -1118,7 +1144,9 @@ class PlanningTool extends Component {
     }
 
     return (
-      <div className='resource-group'>
+      <div
+        className='resource-group'
+      >
         <div
           className="resource"
           onClick={() => this.toggleGroup(group.id)}
@@ -1143,7 +1171,7 @@ class PlanningTool extends Component {
             className="edit-icon"><HiOutlinePencil/>
           </span>
               <span
-                className="remove-icon"
+                className="remove-icon action-icon"
                 onClick={(e) => this.handleRemoveResource(e, group)}
               >
               <FaPlus/>
@@ -1151,12 +1179,12 @@ class PlanningTool extends Component {
               <div className="reorder-icons">
               <span
                 onClick={(e) => this.handleReorderResource(e, group, 'up')}
-                className={`order-up-icon order-icon ${ordering && orderUp ? '' : 'disabled'}`}>
+                className={`order-up-icon order-icon ${ordering && orderUp ? '' : 'disabled'} action-icon`}>
                 <FaArrowUp/>
               </span>
                 <span
                   onClick={(e) => this.handleReorderResource(e, group, 'down')}
-                  className={`order-down-icon order-icon ${ordering && orderDown ? '' : 'disabled'}`}>
+                  className={`order-down-icon order-icon ${ordering && orderDown ? '' : 'disabled'} action-icon`}>
                 <FaArrowDown/>
               </span>
               </div>
@@ -1181,8 +1209,15 @@ class PlanningTool extends Component {
       return Object.assign({}, group, {
         title:
           <div
-            onMouseEnter={() => this.handleShowIconsOnMouseEnter(group.id)}
-            onMouseLeave={() => this.handleShowIconsOnMouseLeave(group.id)}
+            onMouseEnter={async (e) => {
+              const {currentTarget} = e
+              await this.handleShowIconsOnMouseEnter(group.id)
+              this.groupOnEnter(currentTarget)
+            }}
+            onMouseLeave={() => {
+              this.handleShowIconsOnMouseLeave(group.id)
+              this.groupOnLeave()
+            }}
             onKeyUp={(e) => this.handleInputFieldOnKeyUp(e, group.id)}
           >
             {this.renderGroup(group)}

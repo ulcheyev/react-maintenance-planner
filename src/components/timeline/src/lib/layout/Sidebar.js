@@ -63,6 +63,10 @@ export default class Sidebar extends Component {
     this.props.handleSidebarResize.down(e)
   }
 
+  onSidebarOver = (e) =>{
+    e.stopPropagation()
+  }
+
   render() {
     const {groupHeights, height, width, isRightSidebar} = this.props
     const {groupIdKey, groupTitleKey, groupRightTitleKey} = this.props.keys
@@ -109,6 +113,7 @@ export default class Sidebar extends Component {
         <div
           className={'rct-sidebar-resize'}
           onMouseDown={this.onSidebarDown}
+          onMouseOver={this.onSidebarOver}
         />
       </div>
     )

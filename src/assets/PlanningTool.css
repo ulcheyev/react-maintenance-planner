@@ -204,7 +204,7 @@
 }
 
 .react-calendar-timeline .rct-sidebar .rct-sidebar-row {
-  overflow: visible;
+  overflow: hidden;
 }
 
 .react-calendar-timeline .rct-sidebar {
@@ -231,6 +231,15 @@
   gap: 2px;
 }
 
-.order-icon.disabled svg{
+.order-icon.disabled svg {
   fill: #c3c3c3;
+}
+
+.action-icon {
+  opacity: 1;
+  transition-duration: .5s;
+}
+
+.action-icon:hover {
+  opacity: .5;
 }
