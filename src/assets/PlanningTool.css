@@ -204,7 +204,8 @@
 }
 
 .react-calendar-timeline .rct-sidebar .rct-sidebar-row {
-  overflow: hidden;
+  overflow: visible;
+  overflow-x: clip;
 }
 
 .react-calendar-timeline .rct-sidebar {

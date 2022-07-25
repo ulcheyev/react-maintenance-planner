@@ -1191,7 +1191,8 @@ class PlanningTool extends Component {
             </div>
           }
         </div>
-        {group.showIcons &&
+
+        {(group.showIcons || true)  &&
           <FaPlus className="add-resource" onClick={() => this.handleAddResource(group)}/>
         }
       </div>
