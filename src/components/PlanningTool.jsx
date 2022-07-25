@@ -13,8 +13,9 @@ import './../assets/PlanningTool.css'
 import PropTypes from "prop-types"
 import Popup from './Popup'
 import Modal from './Modal'
+import EditItemModal from './EditItemModal'
 import Constants from '../constants/Constants'
-import {actions} from "@storybook/addon-actions";
+import {actions} from "@storybook/addon-actions"
 
 const keys = {
   groupIdKey: "id",
@@ -48,19 +49,7 @@ class PlanningTool extends Component {
 
     //setting default values of items
     for (const item of items) {
-      item.parent = item.parent != null ? item.parent : null
-      item.className = item.className != null ? item.className : 'item'
-      item.bgColor = item.bgColor != null ? item.bgColor : '#2196F3'
-      item.color = item.color != null ? item.color : '#fff'
-      item.selectedBgColor = item.selectedBgColor != null ? item.selectedBgColor : '#FFC107'
-      item.selectedColor = item.selectedColor != null ? item.selectedColor : '#000'
-      item.draggingBgColor = item.draggingBgColor != null ? item.draggingBgColor : '#f00'
-      item.highlightBgColor = item.highlightBgColor != null ? item.highlightBgColor : '#FFA500'
-      item.highlight = item.highlight != null ? item.highlight : false
-      item.canMove = item.canMove != null ? item.canMove : true
-      item.canResize = item.canResize != null ? item.canResize : 'both'
-      item.minimumDuration = item.minimumDuration != null ? item.minimumDuration : false
-      item.maximumDuration = item.maximumDuration != null ? item.maximumDuration : false
+      this.setItemDefaults(item)
     }
 
     //sorting groups tree to order by parent
@@ -99,6 +88,8 @@ class PlanningTool extends Component {
 
     const addResourceModal = false
 
+    const editItemModal = this.getEditItemModalDefaults()
+
     this.state = {
       groups,
       items,
@@ -111,9 +102,36 @@ class PlanningTool extends Component {
       milestones,
       showIcons,
       addResourceModal,
+      editItemModal,
     }
   }
 
+  setItemDefaults = (item) => {
+    item.title = item.title != null ? item.title : ''
+    item.parent = item.parent != null ? item.parent : null
+    item.className = item.className != null ? item.className : 'item'
+    item.bgColor = item.bgColor != null ? item.bgColor : '#2196F3'
+    item.color = item.color != null ? item.color : '#fff'
+    item.selectedBgColor = item.selectedBgColor != null ? item.selectedBgColor : '#FFC107'
+    item.selectedColor = item.selectedColor != null ? item.selectedColor : '#000'
+    item.draggingBgColor = item.draggingBgColor != null ? item.draggingBgColor : '#f00'
+    item.highlightBgColor = item.highlightBgColor != null ? item.highlightBgColor : '#FFA500'
+    item.highlight = item.highlight != null ? item.highlight : false
+    item.canMove = item.canMove != null ? item.canMove : true
+    item.canResize = item.canResize != null ? item.canResize : 'both'
+    item.minimumDuration = item.minimumDuration != null ? item.minimumDuration : false
+    item.maximumDuration = item.maximumDuration != null ? item.maximumDuration : false
+  }
+
+  getEditItemModalDefaults = () => {
+    return {
+      open: false,
+      item: null,
+      title: '',
+      onSubmit: this.handleEditItemModalSubmit,
+      onClose: this.handleEditItemModalClose,
+    }
+  }
 
   /**
    * Event handler when changing position of item
@@ -1105,6 +1123,80 @@ class PlanningTool extends Component {
     return this.state.groups.filter(g => g.parent === group.parent)
   }
 
+  renderEditItemModal = () => {
+    const {editItemModal} = this.state
+
+    if (!editItemModal.open) {
+      return (
+        <></>
+      )
+    }
+
+    return (
+      <EditItemModal
+        title={editItemModal.title}
+        item={editItemModal.item}
+        onSubmit={editItemModal.onSubmit}
+        onClose={editItemModal.onClose}
+      />
+    )
+  }
+
+  handleOnCanvasDoubleClick = (groupId, time, e) => {
+    const {items, editItemModal} = this.state
+
+    const startDate = moment(time), endDate = moment(time).add(1, 'hour')
+    const lastId = Math.max(...items.map(i => i.id))
+
+    const item = {
+      id: lastId + 1,
+      title: '',
+      group: groupId,
+      start: startDate,
+      end: endDate,
+    }
+
+    this.setItemDefaults(item)
+    items.push(item)
+
+    this.setState({
+      items,
+      editItemModal: {
+        ...editItemModal,
+        open: true,
+        item: item,
+        title: 'Add new item',
+      }
+    })
+  }
+
+  handleEditItemModalSubmit = (item, data) => {
+    const {items} = this.state
+
+    data.date.from.month -= 1
+    data.date.to.month -= 1
+
+    item = items.find(i => i.id === item.id)
+    item.title = data.title
+    item.start = moment(data.date.from)
+    item.end = moment(data.date.to)
+
+    const editItemModal = this.getEditItemModalDefaults()
+
+    this.setState({
+      items,
+      editItemModal,
+    })
+  }
+
+  handleEditItemModalClose = () => {
+    const editItemModal = this.getEditItemModalDefaults()
+
+    this.setState({
+      editItemModal,
+    })
+  }
+
   groupOnEnter = (target) => {
     if (this.state.sidebarResizing || !target) {
       return
@@ -1247,6 +1339,7 @@ class PlanningTool extends Component {
                     onItemMove={this.handleItemMove}
                     onItemResize={this.handleItemResize}
                     onItemDeselect={this.itemDeselected}
+                    onCanvasDoubleClick={this.handleOnCanvasDoubleClick}
                     onItemDrag={this.handleItemDrag}
                     handleSidebarResize={{
                       down: this.onSidebarDown,
@@ -1319,6 +1412,8 @@ class PlanningTool extends Component {
         {this.state.addResourceModal &&
           this.renderAddResourceModal(this.state.addResourceModal)
         }
+
+        {this.renderEditItemModal()}
 
         {/*<div onClick={() => this.focusItems(items.filter(item => (item.id === 8 || item.id === 10)))}>
           focus
