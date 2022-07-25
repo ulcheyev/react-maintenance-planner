@@ -1,13 +1,13 @@
 .timeline-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: nowrap;
   width: 100%;
 }
 
 .timeline {
   position: relative;
-  width: calc(100% - 30rem);
+  /*width: calc(100% - 30rem);*/
 }
 
 .task_card {
@@ -38,14 +38,14 @@
   z-index: 100;
 }
 
-.explanatory-notes-container {
+/*.explanatory-notes-container {
   position: fixed;
   display: flex;
   padding: 2rem;
   flex-direction: column;
   top: 0;
   right: 0;
-}
+}*/
 
 .explanatory-notes, .popup {
   background-color: #dadada;

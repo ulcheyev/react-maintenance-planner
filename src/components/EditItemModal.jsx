@@ -4,6 +4,10 @@ import Modal from "./Modal"
 import DateTimePicker from 'react-calendar-datetime-picker'
 import 'react-calendar-datetime-picker/dist/index.css'
 
+import DropdownTreeSelect from 'react-dropdown-tree-select'
+import 'react-dropdown-tree-select/dist/styles.css'
+import './../assets/DropdownSelect.css'
+
 const EditItemModal = (props) => {
 
   const formRefs = {
@@ -30,17 +34,23 @@ const EditItemModal = (props) => {
   }
 
   const [date, setDate] = useState(null)
+  let groupId = props.currentGroupId
+
+  const onChange = (currentNode, selectedNodes) => {
+    groupId = currentNode.value
+  }
 
   return (
     <Modal
       title={props.title}
       onClose={() => {
-        props.onClose()
+        props.onClose(item)
       }}
       onSubmit={() => {
         props.onSubmit(item, {
           title: formRefs.title.current.value,
           date,
+          groupId,
         })
       }}
     >
@@ -60,6 +70,15 @@ const EditItemModal = (props) => {
         showTimeInput
         autoClose={false}
       />
+      <label>
+        Select resource
+      </label>
+        <DropdownTreeSelect
+          className="mdl-demo"
+          data={props.groups}
+          onChange={onChange}
+          mode="radioSelect"
+        />
     </Modal>
   )
 }

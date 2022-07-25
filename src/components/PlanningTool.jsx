@@ -128,6 +128,7 @@ class PlanningTool extends Component {
       open: false,
       item: null,
       title: '',
+      currentGroupId: null,
       onSubmit: this.handleEditItemModalSubmit,
       onClose: this.handleEditItemModalClose,
     }
@@ -1123,6 +1124,23 @@ class PlanningTool extends Component {
     return this.state.groups.filter(g => g.parent === group.parent)
   }
 
+  getGroupsTree = (defaultValue) => {
+    const groups = this.state.groups
+
+    return this.flatGroupToTree(groups, null, defaultValue)
+  }
+
+  flatGroupToTree = (groups, id = null, defaultValue = null) => {
+    return groups
+      .filter(group => group['parent'] === id)
+      .map(group => ({
+        label: group.title,
+        value: group.id,
+        isDefaultValue: group.id === defaultValue,
+        children: this.flatGroupToTree(groups, group.id, defaultValue)
+      }))
+  }
+
   renderEditItemModal = () => {
     const {editItemModal} = this.state
 
@@ -1132,10 +1150,14 @@ class PlanningTool extends Component {
       )
     }
 
+    const groups = this.getGroupsTree(editItemModal.currentGroupId)
+
     return (
       <EditItemModal
         title={editItemModal.title}
         item={editItemModal.item}
+        currentGroupId={editItemModal.currentGroupId}
+        groups={groups}
         onSubmit={editItemModal.onSubmit}
         onClose={editItemModal.onClose}
       />
@@ -1163,6 +1185,7 @@ class PlanningTool extends Component {
       items,
       editItemModal: {
         ...editItemModal,
+        currentGroupId: groupId,
         open: true,
         item: item,
         title: 'Add new item',
@@ -1173,6 +1196,8 @@ class PlanningTool extends Component {
   handleEditItemModalSubmit = (item, data) => {
     const {items} = this.state
 
+    console.log(data)
+
     data.date.from.month -= 1
     data.date.to.month -= 1
 
@@ -1180,6 +1205,7 @@ class PlanningTool extends Component {
     item.title = data.title
     item.start = moment(data.date.from)
     item.end = moment(data.date.to)
+    item.group = data.groupId
 
     const editItemModal = this.getEditItemModalDefaults()
 
@@ -1189,11 +1215,19 @@ class PlanningTool extends Component {
     })
   }
 
-  handleEditItemModalClose = () => {
+  handleEditItemModalClose = (item) => {
+    const {items} = this.state
+
+    const index = items.indexOf(item)
+    if (index > -1) {
+      items.splice(index, 1)
+    }
+
     const editItemModal = this.getEditItemModalDefaults()
 
     this.setState({
       editItemModal,
+      items,
     })
   }
 
@@ -1402,7 +1436,8 @@ class PlanningTool extends Component {
               <button className={`action-button ${this.actions.length <= 0 ? 'disabled' : ''}`} onClick={this.undo}>
                 Undo
               </button>
-              <button className={`action-button ${this.redoActions.length <= 0 ? 'disabled' : ''}`} onClick={this.redo}>
+              <button className={`action-button ${this.redoActions.length <= 0 ? 'disabled' : ''}`}
+                      onClick={this.redo}>
                 Redo
               </button>
             </div>
@@ -1424,7 +1459,8 @@ class PlanningTool extends Component {
 }
 
 
-PlanningTool.propTypes = {
+PlanningTool
+  .propTypes = {
   items: PropTypes.arrayOf(PropTypes.shape({
       id: PropTypes.number.isRequired,
       group: PropTypes.number.isRequired,
@@ -1463,7 +1499,8 @@ PlanningTool.propTypes = {
   }))
 }
 
-PlanningTool.defaultProps = {
+PlanningTool
+  .defaultProps = {
   items: [
     {
       parent: null,
