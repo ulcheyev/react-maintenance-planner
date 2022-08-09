@@ -11,12 +11,12 @@ import './../assets/DropdownSelect.css'
 const EditItemModal = (props) => {
 
   const formRefs = {
-    title: React.useRef()
+    title: React.useRef(),
   }
 
   const {item} = props
 
-  const defaultValue = {
+  const dateDefaultValue = {
     from: {
       year: item.start.year(),
       month: item.start.month() + 1,
@@ -34,6 +34,8 @@ const EditItemModal = (props) => {
   }
 
   const [date, setDate] = useState(null)
+  const [color, setColor] = useState(props.item?.color)
+  const [bgColor, setBgColor] = useState(props.item?.bgColor)
   let groupId = props.currentGroupId
 
   const onChange = (currentNode, selectedNodes) => {
@@ -44,14 +46,16 @@ const EditItemModal = (props) => {
     <Modal
       title={props.title}
       onClose={() => {
-        props.onClose(item)
+        props.onClose(item, props.mode)
       }}
       onSubmit={() => {
         props.onSubmit(item, {
           title: formRefs.title.current.value,
           date,
           groupId,
-        })
+          color,
+          bgColor,
+        }, props.mode)
       }}
     >
       <label>
@@ -64,7 +68,7 @@ const EditItemModal = (props) => {
       </label>
       <DateTimePicker
         onChange={setDate}
-        initValue={defaultValue}
+        initValue={dateDefaultValue}
         type="range"
         withTime
         showTimeInput
@@ -73,12 +77,28 @@ const EditItemModal = (props) => {
       <label>
         Select resource
       </label>
-        <DropdownTreeSelect
-          className="mdl-demo"
-          data={props.groups}
-          onChange={onChange}
-          mode="radioSelect"
+      <DropdownTreeSelect
+        className="mdl-demo"
+        data={props.groups}
+        onChange={onChange}
+        mode="radioSelect"
+      />
+      <label>
+        Item text color
+        <input
+          type="color"
+          value={color}
+          onChange={e => setColor(e.target.value)}
         />
+      </label>
+      <label>
+        Item background color
+        <input
+          type="color"
+          value={bgColor}
+          onChange={e => setBgColor(e.target.value)}
+        />
+      </label>
     </Modal>
   )
 }
