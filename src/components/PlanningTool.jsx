@@ -280,6 +280,14 @@ class PlanningTool extends Component {
     }
   }
 
+  highlightParents = (item) => {
+    if (item.parent) {
+      const parent = this.state.items.find(i => i.id === item.parent)
+      parent.highlight = true
+      this.highlightParents(parent)
+    }
+  }
+
   /**
    * Turns off highlighting of every item
    */
@@ -692,27 +700,28 @@ class PlanningTool extends Component {
 
     return (
       <div
-        onMouseEnter={() => this.handleShowIconsOnMouseEnter(null, item.id)}
-        onMouseLeave={() => this.handleShowIconsOnMouseLeave(null, item.id)}
-        onKeyUp={(e) => this.handleInputFieldOnKeyUp(e, null, item.id)}
-        {...getItemProps({
-          style: {
-            background: backgroundColor,
-            color: color,
-            minWidth: 20,
-          },
-          /**
-           * Event handler when click on an item
-           */
-          onMouseDown: () => {
-            item.selected = true
-            this.removeHighlight()
-            this.highlightChildren(item)
-            this.showItemInfo(this.state.items.find(i => i.id === item.id))
-            this.setState({
-              items: this.state.items
-            })
-          },
+          onMouseEnter={() => this.handleShowIconsOnMouseEnter(null, item.id)}
+          onMouseLeave={() => this.handleShowIconsOnMouseLeave(null, item.id)}
+          onKeyUp={(e) => this.handleInputFieldOnKeyUp(e, null, item.id)}
+          {...getItemProps({
+            style: {
+              background: backgroundColor,
+              color: color,
+              minWidth: 20,
+            },
+            /**
+             * Event handler when click on an item
+             */
+            onMouseDown: () => {
+              item.selected = true
+              this.removeHighlight()
+              this.highlightChildren(item)
+              this.highlightParents(item)
+              this.showItemInfo(this.state.items.find(i => i.id === item.id))
+              this.setState({
+                items: this.state.items
+              })
+            },
 
         })}
         id={'item-' + item.id}
