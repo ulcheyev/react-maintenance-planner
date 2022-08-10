@@ -83,22 +83,30 @@ const EditItemModal = (props) => {
         onChange={onChange}
         mode="radioSelect"
       />
-      <label>
-        Item text color
-        <input
-          type="color"
-          value={color}
-          onChange={e => setColor(e.target.value)}
-        />
-      </label>
-      <label>
-        Item background color
-        <input
-          type="color"
-          value={bgColor}
-          onChange={e => setBgColor(e.target.value)}
-        />
-      </label>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-evenly',
+          gap: 25
+        }}
+      >
+        <label>
+          Text
+          <input
+            type="color"
+            value={color}
+            onChange={e => setColor(e.target.value)}
+          />
+        </label>
+        <label>
+          Background
+          <input
+            type="color"
+            value={bgColor}
+            onChange={e => setBgColor(e.target.value)}
+          />
+        </label>
+      </div>
     </Modal>
   )
 }
