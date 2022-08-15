@@ -5,4 +5,6 @@ export default class Constants{
   static RESOURCE_ADD = 'resource-add'
   static RESOURCE_REMOVE = 'resource-remove'
   static RESOURCE_REORDER = 'resource-reorder'
+  static MILESTONE_ADD = 'milestone-add'
+  static MILESTONE_EDIT = 'milestone-edit'
 }

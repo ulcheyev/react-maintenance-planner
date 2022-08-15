@@ -825,10 +825,12 @@ export const milestones = MilestonesTemplate.bind({})
 
 const milestonesItems = [
   {
+    id: 1,
     date: moment("2022-03-29T05:00:00.000Z"),
     label: 'Milestone 1',
   },
   {
+    id: 2,
     date: moment("2022-03-31T05:30:00.000Z"),
     label: 'Milestone 2',
     color: '#f00',

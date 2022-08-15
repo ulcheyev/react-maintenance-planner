@@ -243,3 +243,38 @@
 .action-icon:hover {
   opacity: .5;
 }
+
+.modal-switch {
+  display: grid;
+  justify-content: center;
+  grid-template-columns: 1fr 1fr;
+}
+
+.modal-switch-button {
+  padding: 5px 10px;
+  background-color: #E3E3E3;
+  color: #333;
+  transition-duration: .5s;
+  text-align: center;
+  border: 1px solid #333;
+  cursor: pointer;
+  opacity: .7;
+}
+
+.modal-switch-button:hover {
+  opacity: 1;
+}
+
+.modal-switch-button:first-of-type {
+  border-radius: 5px 0 0 5px;
+}
+
+.modal-switch-button:last-of-type {
+  border-radius: 0 5px 5px 0;
+}
+
+.modal-switch-button.active {
+  background-color: #2196f3;
+  color: #fff;
+  opacity: 1;
+}
