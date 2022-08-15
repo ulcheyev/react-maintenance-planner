@@ -175,6 +175,20 @@
   transition: .3s;
 }
 
+.progress-bar-container {
+  margin-top: 1rem;
+  border: solid #545454 1px;
+  background-color: rgb(121, 121, 121);
+  border-radius: .5rem;
+}
+
+.progress-bar {
+  background-color: rgb(62, 122, 235);
+  height: 10px;
+  border-radius: 1rem;
+  transition: 1s ease;
+}
+
 .rct-items .edit-icon svg {
   margin-left: 1rem;
 }
