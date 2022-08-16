@@ -15,7 +15,6 @@ import Popup from './Popup'
 import Modal from './Modal'
 import EditItemModal from './EditItemModal'
 import Constants from '../constants/Constants'
-import {actions} from "@storybook/addon-actions"
 
 const keys = {
   groupIdKey: "id",
@@ -1208,9 +1207,7 @@ class PlanningTool extends Component {
     const {editItemModal} = this.state
 
     if (!editItemModal.open) {
-      return (
-        <></>
-      )
+      return
     }
 
     const groups = this.getGroupsTree(editItemModal.currentGroupId)
@@ -1228,7 +1225,7 @@ class PlanningTool extends Component {
     )
   }
 
-  handleOnCanvasDoubleClick = (groupId, time, e) => {
+  handleOnCanvasDoubleClick = (groupId, time) => {
     const {items, editItemModal} = this.state
 
     const startDate = moment(time), endDate = moment(time).add(1, 'hour')
@@ -1447,6 +1444,7 @@ class PlanningTool extends Component {
                     onItemMove={this.handleItemMove}
                     onItemResize={this.handleItemResize}
                     onItemDeselect={this.itemDeselected}
+                    onItemDoubleClick={this.handleOnCanvasDoubleClick}
                     onCanvasDoubleClick={this.handleOnCanvasDoubleClick}
                     onItemDrag={this.handleItemDrag}
                     handleSidebarResize={{
