@@ -14,10 +14,10 @@ body {
 }
 
 .material-icons {
-  font-family: "Material Icons";
+  font-family: "Material Icons", sans-serif;
   font-weight: normal;
   font-style: normal;
-  font-size: 24px;
+  font-size: 1.5rem;
   line-height: 1;
   letter-spacing: normal;
   text-transform: none;
@@ -34,7 +34,7 @@ body {
  */
 
 .mdl-demo .dropdown-trigger > span:after {
-  font-size: 12px;
+  font-size: 0.9rem;
   color: #555;
 }
 

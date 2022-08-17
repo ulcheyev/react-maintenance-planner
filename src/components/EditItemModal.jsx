@@ -34,8 +34,8 @@ const EditItemModal = (props) => {
   }
 
   const [date, setDate] = useState(null)
-  const [color, setColor] = useState(props.item?.color)
-  const [bgColor, setBgColor] = useState(props.item?.bgColor)
+  const [color, setColor] = useState(props.item.color)
+  const [bgColor, setBgColor] = useState(props.item.bgColor)
   let groupId = props.currentGroupId
 
   const onChange = (currentNode, selectedNodes) => {
@@ -61,7 +61,7 @@ const EditItemModal = (props) => {
       <label>
         Item title
         <input type="text" placeholder="Resource name" ref={formRefs.title}
-               defaultValue={props.item?.title}/>
+               defaultValue={props.item.title}/>
       </label>
       <label>
         Start date

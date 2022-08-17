@@ -807,13 +807,11 @@ class PlanningTool extends Component {
             position: 'relative',
           }}
         >
-          {/*{item.isEditMode ? this.renderEditMode(item.id) : itemContext.title}*/}
           <div>
             {itemContext.title}
             {item.showIcons &&
               <div className="action-icons">
           <span
-            /*onClick={(e) => this.handleEditMode(e, null, item.id)}*/
             onClick={(e) => this.editItem(item)}
             className="edit-icon">
             <HiOutlinePencil/>

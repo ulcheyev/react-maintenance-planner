@@ -31,7 +31,7 @@
     "start": "react-scripts start",
     "dev": "start-storybook -p 6006 -s public",
     "build": "build-storybook -s public",
-    "build:lib": "microbundle -jsx React.createElement --jsxFragment React.Fragment --jsxImportSource react",
+    "build:lib": "microbundle --jsx React.createElement --jsxFragment React.Fragment --jsxImportSource react",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "build-static-webapp": "expo build:web"
