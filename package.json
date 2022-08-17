@@ -1,7 +1,7 @@
 {
   "name": "react-maintenance-planner",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "source": "src/index.js",
   "main": "./dist/react-maintenance-planner.js",
   "exports": {
@@ -34,7 +34,10 @@
     "build:lib": "microbundle --jsx React.createElement --jsxFragment React.Fragment --jsxImportSource react",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "build-static-webapp": "expo build:web"
+    "build-static-webapp": "expo build:web",
+    "release:patch": "npm test && standard-version --release-as patch && npm publish",
+    "release:major": "npm test && standard-version --release-as major && npm publish",
+    "release:minor": "npm test && standard-version --release-as minor && npm publish"
   },
   "eslintConfig": {
     "extends": [
@@ -77,6 +80,7 @@
     "@storybook/testing-library": "^0.0.11",
     "memoize-one": "^6.0.0",
     "microbundle": "^0.14.2",
-    "prop-types": "^15.8.1"
+    "prop-types": "^15.8.1",
+    "standard-version": "^9.5.0"
   }
 }
