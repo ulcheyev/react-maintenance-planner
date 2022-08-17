@@ -4,7 +4,7 @@ React maintenance planner follows the [semantic versioning](https://docs.npmjs.c
 
 ## Publish new release
 
-New releases are done **only** on the **master** branch. The recommended workflow to publish a new release is as follow:
+New releases are done **only** on the **main** branch. The recommended workflow to publish a new release is as follow:
 
 1. Format your files with `npm run prettier:format`.
 2. Commit all your files.
@@ -18,8 +18,8 @@ Pre-releases are automatically managed and published with [Github Actions](https
 
 ### Beta release
 
-Beta releases are automatically published by [github workflow](https://github.com/kbss-cvut/react-maintenance-planner/actions/workflows/npm-publish-beta.yml) when a **pull request** is **merged** on the **master** branch.
+Beta releases are automatically published by [github workflow](https://github.com/kbss-cvut/react-maintenance-planner/actions/workflows/npm-publish-beta.yml) when a **pull request** is **merged** on the **main** branch.
 
 ### Alpha release
 
-Alpha releases are automatically published by [github workflow](https://github.com/kbss-cvut/react-maintenance-planner/actions/workflows/npm-publish-alpha.yml) on every **push** that is **not** on the **master** branch.
+Alpha releases are automatically published by [github workflow](https://github.com/kbss-cvut/react-maintenance-planner/actions/workflows/npm-publish-alpha.yml) on every **push** that is **not** on the **main** branch.
