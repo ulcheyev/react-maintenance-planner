@@ -22,24 +22,24 @@ const EditItemModal = (props) => {
 
   const dateDefaultValue = {
     from: {
-      year: item.start.year(),
-      month: item.start.month() + 1,
-      day: item.start.date(),
-      hour: item.start.hour(),
-      minute: item.start.minute()
+      year: item?.start.year(),
+      month: item?.start.month() + 1,
+      day: item?.start.date(),
+      hour: item?.start.hour(),
+      minute: item?.start.minute()
     },
     to: {
-      year: item.end.year(),
-      month: item.end.month() + 1,
-      day: item.end.date(),
-      hour: item.end.hour(),
-      minute: item.end.minute()
+      year: item?.end.year(),
+      month: item?.end.month() + 1,
+      day: item?.end.date(),
+      hour: item?.end.hour(),
+      minute: item?.end.minute()
     }
   }
 
   const [date, setDate] = useState(null)
-  const [color, setColor] = useState(props.item.color)
-  const [bgColor, setBgColor] = useState(props.item.bgColor)
+  const [color, setColor] = useState(props.item?.color)
+  const [bgColor, setBgColor] = useState(props.item?.bgColor)
   let groupId = props.currentGroupId
 
 
