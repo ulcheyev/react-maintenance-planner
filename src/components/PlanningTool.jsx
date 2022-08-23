@@ -122,15 +122,23 @@ class PlanningTool extends Component {
     item.maximumDuration = item.maximumDuration != null ? item.maximumDuration : false
   }
 
+  setMilestoneDefault = (milestone) => {
+    milestone.date = milestone.date != null ? milestone.date : moment()
+    milestone.label = milestone.label != null ? milestone.label : ''
+    milestone.color = milestone.color != null ? milestone.color : '#000000'
+  }
+
   getEditItemModalDefaults = () => {
     return {
       open: false,
       item: null,
+      milestone: null,
       title: '',
       currentGroupId: null,
       onSubmit: this.handleEditItemModalSubmit,
       onClose: this.handleEditItemModalClose,
       mode: null,
+      type: 'item',
     }
   }
 
@@ -467,6 +475,47 @@ class PlanningTool extends Component {
       this.undoResourceReorder(undoAction)
       return
     }
+    if (undoAction.actionName === Constants.MILESTONE_ADD) {
+      this.undoMilestoneAdd(undoAction)
+      return
+    }
+    if (undoAction.actionName === Constants.MILESTONE_EDIT) {
+      this.undoMilestoneEdit(undoAction)
+      return
+    }
+  }
+
+  undoMilestoneAdd = (undoAction) => {
+    const {milestones} = this.state
+
+    const milestone = milestones.find(m => m.id === undoAction.item.id)
+    const index = milestones.indexOf(milestone)
+    if (index < 0) {
+      return
+    }
+
+    this.addRedoItem(milestone, undoAction.actionName)
+
+    milestones.splice(index, 1)
+
+    this.setState({
+      milestones
+    })
+  }
+
+  undoMilestoneEdit = (undoAction) => {
+    const {milestones} = this.state
+    const undoItem = undoAction.item
+
+    this.addRedoItem(milestones.find(m => m.id === undoItem.id), undoAction.actionName)
+
+    this.setState({
+      milestones: milestones.map(milestone =>
+        milestone.id === undoItem.id
+          ? Object.assign({}, undoItem)
+          : milestone
+      )
+    })
   }
 
   undoItemAdd = (undoAction) => {
@@ -605,6 +654,41 @@ class PlanningTool extends Component {
       this.redoResourceReorder(redoAction)
       return
     }
+    if (redoAction.actionName === Constants.MILESTONE_ADD) {
+      this.redoMilestoneAdd(redoAction)
+      return
+    }
+    if (redoAction.actionName === Constants.MILESTONE_EDIT) {
+      this.redoMilestoneEdit(redoAction)
+      return
+    }
+  }
+
+  redoMilestoneAdd = (redoAction) => {
+    const {milestones} = this.state
+    const redoItem = redoAction.item
+
+    this.addUndoItem(redoItem, redoAction.actionName)
+
+    milestones.push(redoItem)
+
+    this.setState({
+      milestones
+    })
+  }
+
+  redoMilestoneEdit = (redoAction) => {
+    const {milestones} = this.state
+    const redoItem = redoAction.item
+    this.addUndoItem(milestones.find(m => m.id === redoItem.id), redoAction.actionName)
+
+    this.setState({
+      milestones: milestones.map(milestone =>
+        milestone.id === redoItem.id
+          ? Object.assign({}, redoItem)
+          : milestone
+      )
+    })
   }
 
   redoItemEdit = (redoAction) => {
@@ -1206,6 +1290,7 @@ class PlanningTool extends Component {
         item: item,
         title: `Edit item - ${item.title}`,
         mode: 'edit',
+        type: 'item',
       }
     })
   }
@@ -1223,20 +1308,26 @@ class PlanningTool extends Component {
       <EditItemModal
         title={editItemModal.title}
         item={editItemModal.item}
+        milestone={editItemModal.milestone}
         currentGroupId={editItemModal.currentGroupId}
         groups={groups}
         onSubmit={editItemModal.onSubmit}
         onClose={editItemModal.onClose}
         mode={editItemModal.mode}
+        type={editItemModal.type}
       />
     )
   }
 
-  handleOnCanvasDoubleClick = (groupId, time) => {
-    const {items, editItemModal} = this.state
+  handleOnCanvasDoubleClick = (groupId, time, e) => {
+    const {items, milestones, editItemModal} = this.state
 
     const startDate = moment(time), endDate = moment(time).add(1, 'hour')
-    const lastId = Math.max(...items.map(i => i.id))
+    let lastId = Math.max(...items.map(i => i.id))
+
+    if (lastId === Number.NEGATIVE_INFINITY) {
+      lastId = 1
+    }
 
     const item = {
       id: lastId + 1,
@@ -1246,66 +1337,103 @@ class PlanningTool extends Component {
       end: endDate,
     }
 
+    let lastMilestoneId = Math.max(...milestones.map(m => m.id))
+    if (lastMilestoneId === Number.NEGATIVE_INFINITY) {
+      lastMilestoneId = 1
+    }
+
+    const milestone = {
+      id: lastMilestoneId,
+      date: startDate
+    }
+
+    this.setMilestoneDefault(milestone)
     this.setItemDefaults(item)
     items.push(item)
 
     this.setState({
-      items,
       editItemModal: {
         ...editItemModal,
         currentGroupId: groupId,
         open: true,
-        item: item,
+        item,
+        milestone,
         title: 'Add new item',
         mode: 'add',
+        type: 'item',
       }
     })
   }
 
-  handleEditItemModalSubmit = (item, data, mode) => {
-    const {items} = this.state
+  handleEditItemModalSubmit = (item, milestone, data, mode, type) => {
+    const {items, milestones} = this.state
 
-    item = items.find(i => i.id === item.id)
+    if (type === 'item') {
+      if (mode === 'add') {
+        items.push(item)
+        this.addUndoItem(item, Constants.ITEM_ADD, {}, true)
+      } else if (mode === 'edit') {
+        this.addUndoItem(item, Constants.ITEM_EDIT, {}, true)
+      }
 
-    if (mode === 'add') {
-      this.addUndoItem(item, Constants.ITEM_ADD, {}, true)
-    } else if (mode === 'edit') {
-      this.addUndoItem(item, Constants.ITEM_EDIT, {}, true)
+
+      data.date.from.month -= 1
+      data.date.to.month -= 1
+
+      item.title = data.title
+      item.start = moment(data.date.from)
+      item.end = moment(data.date.to)
+      item.group = data.groupId
+      item.color = data.color
+      item.bgColor = data.bgColor
+
+    } else if (type === 'milestone') {
+      if (mode === 'add') {
+        milestones.push(milestone)
+        this.addUndoItem(milestone, Constants.MILESTONE_ADD, {}, true)
+      } else {
+        this.addUndoItem(milestone, Constants.MILESTONE_EDIT, {}, true)
+      }
+
+      data.milestoneDate.month -= 1
+      milestone.label = data.label
+      milestone.date = moment(data.milestoneDate)
+      milestone.color = data.milestoneColor
     }
 
-    data.date.from.month -= 1
-    data.date.to.month -= 1
-
-    item.title = data.title
-    item.start = moment(data.date.from)
-    item.end = moment(data.date.to)
-    item.group = data.groupId
-    item.color = data.color
-    item.bgColor = data.bgColor
-
     const editItemModal = this.getEditItemModalDefaults()
-
     this.setState({
       items,
+      milestones,
       editItemModal,
     })
   }
 
-  handleEditItemModalClose = (item, mode) => {
-    const {items} = this.state
-
-    if (mode === 'add') {
-      const index = items.indexOf(item)
-      if (index > -1) {
-        items.splice(index, 1)
-      }
-    }
-
+  handleEditItemModalClose = () => {
     const editItemModal = this.getEditItemModalDefaults()
 
     this.setState({
       editItemModal,
-      items,
+    })
+  }
+
+  handleMilestoneDoubleClick = (milestone) => {
+    if (!milestone) {
+      return
+    }
+    console.log(milestone)
+
+    const {editItemModal} = this.state
+
+    this.setState({
+      editItemModal: {
+        ...editItemModal,
+        milestone,
+        open: true,
+        title: `Edit milestone - ${milestone.label}`,
+        mode: 'edit',
+        type: 'milestone',
+      }
     })
   }
 
@@ -1468,7 +1596,10 @@ class PlanningTool extends Component {
             {/*milestones*/}
             {milestones.length > 0 ?
               milestones.map((milestone, i) =>
-                <CustomMarker date={milestone.date.valueOf()} key={'marker-' + i}>
+                <CustomMarker
+                  date={milestone.date.valueOf()}
+                  key={'marker-' + i}
+                >
                   {({styles, date}) => {
                     const customStyles = {
                       ...styles,
@@ -1481,6 +1612,7 @@ class PlanningTool extends Component {
                     return <div
                       style={customStyles}
                       className={'milestone'}
+                      onDoubleClick={() => this.handleMilestoneDoubleClick(milestone)}
                     >
                       <span className="milestone-label">
                         {milestone.label ? milestone.label : ''}<br/>
