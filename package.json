@@ -37,7 +37,17 @@
     "build-static-webapp": "expo build:web",
     "release:patch": "standard-version --release-as patch && npm publish",
     "release:major": "standard-version --release-as major && npm publish",
-    "release:minor": "standard-version --release-as minor && npm publish"
+    "release:minor": "standard-version --release-as minor && npm publish",
+    "prettier:check": "npx prettier --check .",
+    "prettier:format": "npx prettier --write .",
+    "precommit": "lint-staged",
+    "prepare": "husky install"
+  },
+  "standard-version": {
+    "releaseCommitMessageFormat": "[{{currentTag}}] Bump version"
+  },
+  "lint-staged": {
+    "*": "prettier --check"
   },
   "eslintConfig": {
     "extends": [
@@ -78,8 +88,11 @@
     "@storybook/preset-create-react-app": "^4.1.0",
     "@storybook/react": "^6.4.22",
     "@storybook/testing-library": "^0.0.11",
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.3",
     "memoize-one": "^6.0.0",
     "microbundle": "^0.14.2",
+    "prettier": "2.7.1",
     "prop-types": "^15.8.1",
     "standard-version": "^9.5.0"
   }
