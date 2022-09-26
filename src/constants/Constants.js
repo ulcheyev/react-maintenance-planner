@@ -1,4 +1,4 @@
-export default class Constants{
+export default class Constants {
   static ITEM_EDIT = 'item-edit'
   static ITEM_ADD = 'item-add'
   static RESOURCE_EDIT = 'resource-edit'
@@ -7,4 +7,6 @@ export default class Constants{
   static RESOURCE_REORDER = 'resource-reorder'
   static MILESTONE_ADD = 'milestone-add'
   static MILESTONE_EDIT = 'milestone-edit'
+  static ITEM_DELETE = 'item-delete'
+  static MILESTONE_DELETE = 'milestone-delete'
 }
