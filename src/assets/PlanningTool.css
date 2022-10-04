@@ -66,18 +66,6 @@
   margin-right: 1.3rem;
 }
 
-.explanatory-notes .note .color.scheduled-wo {
-  background-color: #aa0000;
-}
-
-.explanatory-notes .note .color.task-card {
-  background-color: #00aa00;
-}
-
-.explanatory-notes .note .color.maintenance-wo {
-  background-color: #0000aa;
-}
-
 .static-item:after {
   content: '';
   display: block;

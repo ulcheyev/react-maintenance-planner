@@ -15,6 +15,7 @@ import Popup from './Popup'
 import Modal from './Modal'
 import EditItemModal from './EditItemModal'
 import Constants from '../constants/Constants'
+import Legend from "./Legend";
 
 const keys = {
   groupIdKey: "id",
@@ -1627,21 +1628,7 @@ class PlanningTool extends Component {
             }
           </Timeline>
           <div className="explanatory-notes-container">
-            <div className="explanatory-notes">
-              <h3>Task types</h3>
-              <div className="note">
-                <span className="color scheduled-wo"/>
-                Scheduled_wo
-              </div>
-              <div className="note">
-                <span className="color task-card"/>
-                Task_card
-              </div>
-              <div className="note">
-                <span className="color maintenance-wo"/>
-                Maintenance_wo
-              </div>
-            </div>
+            <Legend legendItems={this.props.legendItems} title="Legend" />
             {this.renderPopup(popup)}
             {/*undo redo*/}
             <div className="action-buttons">
@@ -1710,6 +1697,10 @@ PlanningTool
     date: PropTypes.instanceOf(moment).isRequired,
     label: PropTypes.string,
     color: PropTypes.string,
+  })),
+  legendItems: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string,
+    color: PropTypes.string
   }))
 }
 
@@ -1734,5 +1725,19 @@ PlanningTool
   ],
   groups: [],
   popup: Popup,
+  legendItems: [
+      {
+        name: "scheduled_wo",
+        color: "red"
+      },
+    {
+      name: "maintenance_wo",
+      color: "green"
+    },
+    {
+      name: "task group",
+      color: "blue"
+    }
+    ]
 }
 export default PlanningTool
