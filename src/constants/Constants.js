@@ -7,4 +7,15 @@ export default class Constants{
   static RESOURCE_REORDER = 'resource-reorder'
   static MILESTONE_ADD = 'milestone-add'
   static MILESTONE_EDIT = 'milestone-edit'
+  static DEFAULT_LEGEND_ITEMS = [
+    {
+      name: "current selection & parents/children",
+      color: "#FFC107",
+    },
+    {
+      name: "non movable item",
+      color:
+          "repeating-linear-gradient( -45deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0) 2px, #465298 2px, #465298 4px )",
+    },
+  ];
 }

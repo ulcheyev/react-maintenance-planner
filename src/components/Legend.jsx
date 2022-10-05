@@ -1,6 +1,9 @@
 import React from "react";
+import Constants from "../constants/Constants";
 
 const Legend = ({ title, legendItems }) => {
+  let defaultItems = Constants.DEFAULT_LEGEND_ITEMS;
+
   return (
     <div className="explanatory-notes">
       <h3>{title}</h3>
@@ -8,11 +11,22 @@ const Legend = ({ title, legendItems }) => {
         {legendItems.map((item, index) => {
           return (
             <div key={index} className="note">
-              <span
-                className="color"
-                style={{ backgroundColor: `${item.color}` }}
-              ></span>
-              {item.name}
+              <div
+                className="legend-color"
+                style={{ background: `${item.color}` }}
+              />
+              <div className="legend-item">{item.name}</div>
+            </div>
+          );
+        })}
+        {defaultItems.map((item, index) => {
+          return (
+            <div key={index} className="note">
+              <div
+                className="legend-color"
+                style={{ background: `${item.color}` }}
+              />
+              <div className="legend-item">{item.name}</div>
             </div>
           );
         })}
