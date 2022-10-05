@@ -9,11 +9,11 @@ export default class Constants{
   static MILESTONE_EDIT = 'milestone-edit'
   static DEFAULT_LEGEND_ITEMS = [
     {
-      name: "current selection & parents/children",
+      name: "Current selection & parents/children",
       color: "#FFC107",
     },
     {
-      name: "non movable item",
+      name: "Non-movable item",
       color:
           "repeating-linear-gradient( -45deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0) 2px, #465298 2px, #465298 4px )",
     },

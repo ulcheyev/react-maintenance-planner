@@ -49,7 +49,7 @@
 .explanatory-notes .note {
   display: flex;
   align-items: center;
-  padding: .2rem;
+  padding-top: .5rem;
 }
 
 .explanatory-notes .note .legend-color {
