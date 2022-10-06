@@ -1,11 +1,9 @@
 name: Publish NPM Beta Package
 
 on:
-  pull_request:
-    types:
-      - "closed"
+  push:
     branches:
-      - "master"
+      - "main"
 
 jobs:
   publish-npm-beta:
