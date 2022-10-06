@@ -9,18 +9,6 @@
   width: calc(100% - 30rem);
 }
 
-.task_card {
-  background: #0000aa;
-}
-
-.scheduled_wo {
-  background: #00aa00;
-}
-
-.maintenance_wo {
-  background: #aa0000;
-}
-
 .rct-sidebar {
   position: relative;
   padding-right: 0.25rem;
@@ -58,24 +46,17 @@
   margin-bottom: 1.25rem;
 }
 
-.explanatory-notes .note .color {
-  display: inline-block;
+.explanatory-notes .note {
+  display: flex;
+  align-items: center;
+  padding-top: .5rem;
+}
+
+.explanatory-notes .note .legend-color {
   background-color: #000;
   width: 1.5rem;
   height: 0.8rem;
   margin-right: 1.3rem;
-}
-
-.explanatory-notes .note .color.scheduled-wo {
-  background-color: #aa0000;
-}
-
-.explanatory-notes .note .color.task-card {
-  background-color: #00aa00;
-}
-
-.explanatory-notes .note .color.maintenance-wo {
-  background-color: #0000aa;
 }
 
 .static-item:after {
