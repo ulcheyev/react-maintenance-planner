@@ -1,10 +1,14 @@
 import React from "react"
-import {FaPlus} from 'react-icons/fa'
+import {FaPlus, FaCheck, FaTrash} from 'react-icons/fa'
 import './../assets/Modal.css'
 
 export default class Modal extends React.Component {
   onSubmit = () => {
     this.props.onSubmit()
+  }
+
+  onDelete = () => {
+    this.props.onDelete()
   }
 
   render() {
@@ -16,9 +20,16 @@ export default class Modal extends React.Component {
         </div>
         <div className="modal-body">
           {this.props.children}
-          <button className="modal-submit" onClick={this.onSubmit}>
-            Submit
-          </button>
+          <div className="modal-buttons">
+            <button className="modal-submit" onClick={this.onSubmit}>
+              <FaCheck/> Submit
+            </button>
+            {this.props.onDelete && (
+              <button className="modal-delete" onClick={this.onDelete}>
+                <FaTrash/> Delete
+              </button>
+            )}
+          </div>
         </div>
       </div>
     )

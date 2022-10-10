@@ -138,6 +138,7 @@ class PlanningTool extends Component {
       currentGroupId: null,
       onSubmit: this.handleEditItemModalSubmit,
       onClose: this.handleEditItemModalClose,
+      onDelete: this.handleEditItemModalDelete,
       mode: null,
       type: 'item',
     }
@@ -484,6 +485,40 @@ class PlanningTool extends Component {
       this.undoMilestoneEdit(undoAction)
       return
     }
+    if (undoAction.actionName === Constants.ITEM_DELETE) {
+      this.undoItemDelete(undoAction)
+      return
+    }
+    if (undoAction.actionName === Constants.MILESTONE_DELETE) {
+      this.undoMilestoneDelete(undoAction)
+      return
+    }
+  }
+
+  undoMilestoneDelete = (undoAction) => {
+    const {milestones} = this.state
+    const undoMilestone = undoAction.item
+
+    milestones.splice(undoAction.params.index, 0, undoMilestone)
+
+    this.addRedoItem(undoMilestone, Constants.MILESTONE_DELETE)
+
+    this.setState({
+      milestones
+    })
+  }
+
+  undoItemDelete = (undoAction) => {
+    const {items} = this.state
+    const undoItem = undoAction.item
+
+    items.splice(undoAction.params.index, 0, undoItem)
+
+    this.addRedoItem(undoItem, Constants.ITEM_DELETE)
+
+    this.setState({
+      items
+    })
   }
 
   undoMilestoneAdd = (undoAction) => {
@@ -663,6 +698,44 @@ class PlanningTool extends Component {
       this.redoMilestoneEdit(redoAction)
       return
     }
+    if (redoAction.actionName === Constants.ITEM_DELETE) {
+      this.redoItemDelete(redoAction)
+      return
+    }
+    if (redoAction.actionName === Constants.MILESTONE_DELETE) {
+      this.redoMilestoneDelete(redoAction)
+      return
+    }
+  }
+
+  redoMilestoneDelete = (redoAction) => {
+    const {milestones} = this.state
+    const redoMilestone = redoAction.item
+
+    const index = milestones.indexOf(redoMilestone)
+    if (index > -1) {
+      milestones.splice(index, 1)
+      this.addUndoItem(redoMilestone, redoAction.actionName, {index})
+    }
+
+    this.setState({
+      milestones
+    })
+  }
+
+  redoItemDelete = (redoAction) => {
+    const {items} = this.state
+    const redoItem = redoAction.item
+
+    const index = items.indexOf(redoItem)
+    if (index > -1) {
+      items.splice(index, 1)
+      this.addUndoItem(redoItem, redoAction.actionName, {index})
+    }
+
+    this.setState({
+      items
+    })
   }
 
   redoMilestoneAdd = (redoAction) => {
@@ -842,28 +915,28 @@ class PlanningTool extends Component {
 
     return (
       <div
-          onMouseEnter={() => this.handleShowIconsOnMouseEnter(null, item.id)}
-          onMouseLeave={() => this.handleShowIconsOnMouseLeave(null, item.id)}
-          onKeyUp={(e) => this.handleInputFieldOnKeyUp(e, null, item.id)}
-          {...getItemProps({
-            style: {
-              background: backgroundColor,
-              color: color,
-              minWidth: 20,
-            },
-            /**
-             * Event handler when click on an item
-             */
-            onMouseDown: () => {
-              item.selected = true
-              this.removeHighlight()
-              this.highlightChildren(item)
-              this.highlightParents(item)
-              this.showItemInfo(this.state.items.find(i => i.id === item.id))
-              this.setState({
-                items: this.state.items
-              })
-            },
+        onMouseEnter={() => this.handleShowIconsOnMouseEnter(null, item.id)}
+        onMouseLeave={() => this.handleShowIconsOnMouseLeave(null, item.id)}
+        onKeyUp={(e) => this.handleInputFieldOnKeyUp(e, null, item.id)}
+        {...getItemProps({
+          style: {
+            background: backgroundColor,
+            color: color,
+            minWidth: 20,
+          },
+          /**
+           * Event handler when click on an item
+           */
+          onMouseDown: () => {
+            item.selected = true
+            this.removeHighlight()
+            this.highlightChildren(item)
+            this.highlightParents(item)
+            this.showItemInfo(this.state.items.find(i => i.id === item.id))
+            this.setState({
+              items: this.state.items
+            })
+          },
 
         })}
         id={'item-' + item.id}
@@ -1314,6 +1387,7 @@ class PlanningTool extends Component {
         groups={groups}
         onSubmit={editItemModal.onSubmit}
         onClose={editItemModal.onClose}
+        onDelete={editItemModal.onDelete}
         mode={editItemModal.mode}
         type={editItemModal.type}
       />
@@ -1340,18 +1414,17 @@ class PlanningTool extends Component {
 
     let lastMilestoneId = Math.max(...milestones.map(m => m.id))
     if (lastMilestoneId === Number.NEGATIVE_INFINITY) {
-      lastMilestoneId = 1
+      lastMilestoneId = 0
     }
 
     const milestone = {
-      id: lastMilestoneId,
+      id: lastMilestoneId + 1,
       date: startDate
     }
 
     this.setMilestoneDefault(milestone)
     this.setItemDefaults(item)
-    items.push(item)
-
+    
     this.setState({
       editItemModal: {
         ...editItemModal,
@@ -1363,6 +1436,31 @@ class PlanningTool extends Component {
         mode: 'add',
         type: 'item',
       }
+    })
+  }
+
+  handleEditItemModalDelete = (item, milestone, type) => {
+    const {items, milestones} = this.state
+
+    if (type === 'item') {
+      const index = items.indexOf(item)
+      if (index > -1) {
+        items.splice(index, 1)
+        this.addUndoItem(item, Constants.ITEM_DELETE, {index}, true)
+      }
+    } else if (type === 'milestone') {
+      const index = milestones.indexOf(milestone)
+      if (index > -1) {
+        milestones.splice(index, 1)
+        this.addUndoItem(milestone, Constants.MILESTONE_DELETE, {index}, true)
+      }
+    }
+
+    const editItemModal = this.getEditItemModalDefaults()
+    this.setState({
+      items,
+      milestones,
+      editItemModal
     })
   }
 
@@ -1422,7 +1520,6 @@ class PlanningTool extends Component {
     if (!milestone) {
       return
     }
-    console.log(milestone)
 
     const {editItemModal} = this.state
 
@@ -1525,15 +1622,49 @@ class PlanningTool extends Component {
           }
         </div>
 
-        {(group.showIcons || true)  &&
+        {(group.showIcons || true) &&
           <FaPlus className="add-resource" onClick={() => this.handleAddResource(group)}/>
         }
       </div>
     )
   }
 
+  renderMilestones = () => {
+    const {milestones} = this.state
+
+    return (
+      milestones.map((milestone) =>
+        <CustomMarker
+          date={milestone.date.valueOf()}
+          key={'marker-' + milestone.id}
+        >
+          {({styles, date}) => {
+            const customStyles = {
+              ...styles,
+              backgroundColor: milestone.color ? milestone.color : '#000',
+              width: '3px',
+              pointerEvents: 'auto',
+              zIndex: 1000,
+            }
+
+            return <div
+              style={customStyles}
+              className={'milestone'}
+              onDoubleClick={() => this.handleMilestoneDoubleClick(milestone)}
+            >
+                      <span className="milestone-label">
+                        {milestone.label ? milestone.label : ''}<br/>
+                        <span className="milestone-date">{milestone.date.format('LLL')}</span>
+                      </span>
+            </div>
+          }}
+        </CustomMarker>
+      )
+    )
+  }
+
   render() {
-    const {groups, items, defaultTimeStart, defaultTimeEnd, sidebarWidth, popup, milestones} = this.state
+    const {groups, items, defaultTimeStart, defaultTimeEnd, sidebarWidth, popup} = this.state
 
     /**
      * Filters groups which should be displayed in timeline
@@ -1594,38 +1725,8 @@ class PlanningTool extends Component {
             {/*current time marker*/}
             <TodayMarker interval={1000}/>
 
-            {/*milestones*/}
-            {milestones.length > 0 ?
-              milestones.map((milestone, i) =>
-                <CustomMarker
-                  date={milestone.date.valueOf()}
-                  key={'marker-' + i}
-                >
-                  {({styles, date}) => {
-                    const customStyles = {
-                      ...styles,
-                      backgroundColor: milestone.color ? milestone.color : '#000',
-                      width: '3px',
-                      pointerEvents: 'auto',
-                      zIndex: 1000,
-                    }
+            {this.renderMilestones()}
 
-                    return <div
-                      style={customStyles}
-                      className={'milestone'}
-                      onDoubleClick={() => this.handleMilestoneDoubleClick(milestone)}
-                    >
-                      <span className="milestone-label">
-                        {milestone.label ? milestone.label : ''}<br/>
-                        <span className="milestone-date">{milestone.date.format('LLL')}</span>
-                      </span>
-                    </div>
-                  }}
-                </CustomMarker>
-              )
-              :
-              ''
-            }
           </Timeline>
           <div className="explanatory-notes-container">
             <Legend legendItems={this.props.legendItems} title="Legend" />

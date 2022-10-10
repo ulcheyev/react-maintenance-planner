@@ -53,7 +53,14 @@ input {
   padding: 5px 10px;
 }
 
-.modal-submit {
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin-top: 10px;
+}
+
+.modal-submit, .modal-delete {
   padding: 10px;
   background-color: #fff;
   border: 1px solid #333;
@@ -61,7 +68,6 @@ input {
   font-family: "Roboto", sans-serif;
   font-size: 1rem;
   transition-duration: .5s;
-  margin-top: 10px;
   cursor: pointer;
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
@@ -69,9 +75,11 @@ input {
   -moz-user-select: none; /* Old versions of Firefox */
   -ms-user-select: none; /* Internet Explorer/Edge */
   user-select: none;
+  display: flex;
+  gap: 5px;
 }
 
-.modal-submit:hover {
+.modal-submit:hover, .modal-delete:hover {
   background-color: #333;
   color: #fff;
 }

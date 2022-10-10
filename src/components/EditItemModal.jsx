@@ -43,7 +43,6 @@ const EditItemModal = (props) => {
   let groupId = props.currentGroupId
 
 
-
   const milestoneDateDefaultValue = {
     year: milestone?.date.year(),
     month: milestone?.date.month() + 1,
@@ -58,6 +57,11 @@ const EditItemModal = (props) => {
   const onChange = (currentNode, selectedNodes) => {
     groupId = currentNode.value
   }
+
+  const onDelete = () => {
+    props.onDelete(item, milestone, type, props.type)
+  }
+
 
   return (
     <Modal
@@ -77,6 +81,7 @@ const EditItemModal = (props) => {
           milestoneColor,
         }, props.mode, type)
       }}
+      onDelete={props.mode === 'edit' ? onDelete : null}
     >
 
       {props.mode === 'add' &&
