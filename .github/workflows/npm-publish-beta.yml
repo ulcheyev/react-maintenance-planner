@@ -1,15 +1,12 @@
 name: Publish NPM Beta Package
 
 on:
-  pull_request:
-    types:
-      - "closed"
+  push:
     branches:
-      - "master"
+      - "main"
 
 jobs:
   publish-npm-beta:
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
