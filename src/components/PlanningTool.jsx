@@ -1423,8 +1423,7 @@ class PlanningTool extends Component {
 
     this.setMilestoneDefault(milestone)
     this.setItemDefaults(item)
-    // items.push(item)
-
+    
     this.setState({
       editItemModal: {
         ...editItemModal,
