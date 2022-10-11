@@ -250,6 +250,7 @@ const items = [
     "endTime": 1652769900000,
     "duration": 1065900000,
     "workTime": 334560000,
+    "removable": false
   },
   {
     "id": 2,
