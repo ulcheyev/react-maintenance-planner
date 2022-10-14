@@ -970,18 +970,6 @@ class PlanningTool extends Component {
         >
           <div>
             {itemContext.title}
-            {item.showIcons &&
-              <div className="action-icons">
-          <span
-            onClick={(e) => this.editItem(item)}
-            className="edit-icon">
-            <HiOutlinePencil/>
-          </span>
-                <span className="remove-icon">
-              <FaPlus/>
-            </span>
-              </div>
-            }
           </div>
         </div>
 
@@ -1397,6 +1385,10 @@ class PlanningTool extends Component {
     )
   }
 
+  handleOnItemDoubleClick = (itemId, e, time) => {
+    this.editItem(this.state.items.find(i => i.id === itemId))
+  }
+
   handleOnCanvasDoubleClick = (groupId, time, e) => {
     const {items, milestones, editItemModal} = this.state
 
@@ -1719,7 +1711,7 @@ class PlanningTool extends Component {
                     onItemMove={this.handleItemMove}
                     onItemResize={this.handleItemResize}
                     onItemDeselect={this.itemDeselected}
-                    onItemDoubleClick={this.handleOnCanvasDoubleClick}
+                    onItemDoubleClick={this.handleOnItemDoubleClick}
                     onCanvasDoubleClick={this.handleOnCanvasDoubleClick}
                     onItemDrag={this.handleItemDrag}
                     handleSidebarResize={{
