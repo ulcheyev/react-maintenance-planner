@@ -63,8 +63,12 @@ class PlanningTool extends Component {
       return accumulator
     }, [])
 
-    const defaultTimeStart = items.length > 0 ? moment(items[0].start).add(-12, 'hour') : moment()
-    const defaultTimeEnd = items.length > 0 ? moment(items[0].end).add(12, 'hour') : moment()
+    console.log(props.defaultTimeStart)
+
+    const defaultTimeStart = props.defaultTimeStart != null ? moment(props.defaultTimeStart)
+      : (items.length > 0 ? moment(items[0].start).add(-12, 'hour') : moment())
+    const defaultTimeEnd = props.defaultTimeEnd != null ? moment(props.defaultTimeEnd)
+      : (items.length > 0 ? moment(items[0].end).add(12, 'hour') : moment())
 
     const sidebarWidth = 300
     const sidebarResizing = false
@@ -1758,8 +1762,7 @@ class PlanningTool extends Component {
 }
 
 
-PlanningTool
-  .propTypes = {
+PlanningTool.propTypes = {
   items: PropTypes.arrayOf(PropTypes.shape({
       id: PropTypes.number.isRequired,
       group: PropTypes.number.isRequired,
@@ -1803,11 +1806,12 @@ PlanningTool
   legendItems: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string,
     color: PropTypes.string
-  }))
+  })),
+  defaultTimeStart: PropTypes.instanceOf(moment),
+  defaultTimeEnd: PropTypes.instanceOf(moment),
 }
 
-PlanningTool
-  .defaultProps = {
+PlanningTool.defaultProps = {
   items: [
     {
       parent: null,
