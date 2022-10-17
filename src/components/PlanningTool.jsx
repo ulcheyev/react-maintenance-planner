@@ -16,6 +16,7 @@ import Modal from './Modal'
 import EditItemModal from './EditItemModal'
 import Constants from '../constants/Constants'
 import Legend from "./Legend";
+import * as propTypes from "prop-types";
 
 const keys = {
   groupIdKey: "id",
@@ -121,12 +122,14 @@ class PlanningTool extends Component {
     item.canResize = item.canResize != null ? item.canResize : 'both'
     item.minimumDuration = item.minimumDuration != null ? item.minimumDuration : false
     item.maximumDuration = item.maximumDuration != null ? item.maximumDuration : false
+    item.removable = item.removable != null ? item.removable : true
   }
 
   setMilestoneDefault = (milestone) => {
     milestone.date = milestone.date != null ? milestone.date : moment()
     milestone.label = milestone.label != null ? milestone.label : ''
     milestone.color = milestone.color != null ? milestone.color : '#000000'
+    milestone.removable = milestone.removable != null ? milestone.removable : true
   }
 
   getEditItemModalDefaults = () => {
@@ -967,18 +970,6 @@ class PlanningTool extends Component {
         >
           <div>
             {itemContext.title}
-            {item.showIcons &&
-              <div className="action-icons">
-          <span
-            onClick={(e) => this.editItem(item)}
-            className="edit-icon">
-            <HiOutlinePencil/>
-          </span>
-                <span className="remove-icon">
-              <FaPlus/>
-            </span>
-              </div>
-            }
           </div>
         </div>
 
@@ -1394,6 +1385,10 @@ class PlanningTool extends Component {
     )
   }
 
+  handleOnItemDoubleClick = (itemId, e, time) => {
+    this.editItem(this.state.items.find(i => i.id === itemId))
+  }
+
   handleOnCanvasDoubleClick = (groupId, time, e) => {
     const {items, milestones, editItemModal} = this.state
 
@@ -1424,7 +1419,7 @@ class PlanningTool extends Component {
 
     this.setMilestoneDefault(milestone)
     this.setItemDefaults(item)
-    
+
     this.setState({
       editItemModal: {
         ...editItemModal,
@@ -1440,6 +1435,10 @@ class PlanningTool extends Component {
   }
 
   handleEditItemModalDelete = (item, milestone, type) => {
+    if ((item && !item.removable) || (milestone && !milestone.removable)) {
+      return
+    }
+
     const {items, milestones} = this.state
 
     if (type === 'item') {
@@ -1712,7 +1711,7 @@ class PlanningTool extends Component {
                     onItemMove={this.handleItemMove}
                     onItemResize={this.handleItemResize}
                     onItemDeselect={this.itemDeselected}
-                    onItemDoubleClick={this.handleOnCanvasDoubleClick}
+                    onItemDoubleClick={this.handleOnItemDoubleClick}
                     onCanvasDoubleClick={this.handleOnCanvasDoubleClick}
                     onItemDrag={this.handleItemDrag}
                     handleSidebarResize={{
@@ -1729,7 +1728,7 @@ class PlanningTool extends Component {
 
           </Timeline>
           <div className="explanatory-notes-container">
-            <Legend legendItems={this.props.legendItems} title="Legend" />
+            <Legend legendItems={this.props.legendItems} title="Legend"/>
             {this.renderPopup(popup)}
             {/*undo redo*/}
             <div className="action-buttons">
@@ -1781,7 +1780,8 @@ PlanningTool
       minimumDuration: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf([false])]),
       maximumDuration: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf([false])]),
       workTime: PropTypes.number,
-      plannedWorkTime: PropTypes.number
+      plannedWorkTime: PropTypes.number,
+      removable: PropTypes.bool,
     }
   )).isRequired,
   groups: PropTypes.arrayOf(PropTypes.shape({
@@ -1798,6 +1798,7 @@ PlanningTool
     date: PropTypes.instanceOf(moment).isRequired,
     label: PropTypes.string,
     color: PropTypes.string,
+    removable: PropTypes.bool,
   })),
   legendItems: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string,
@@ -1822,15 +1823,16 @@ PlanningTool
       canResize: 'both',
       minimumDuration: false,
       maximumDuration: false,
+      removable: true,
     }
   ],
   groups: [],
   popup: Popup,
   legendItems: [
-      {
-        name: "scheduled_wo",
-        color: "red"
-      },
+    {
+      name: "scheduled_wo",
+      color: "red"
+    },
     {
       name: "maintenance_wo",
       color: "green"
@@ -1839,6 +1841,6 @@ PlanningTool
       name: "task group",
       color: "blue"
     }
-    ]
+  ]
 }
 export default PlanningTool

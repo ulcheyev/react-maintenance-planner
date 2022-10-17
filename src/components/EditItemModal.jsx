@@ -58,8 +58,13 @@ const EditItemModal = (props) => {
     groupId = currentNode.value
   }
 
-  const onDelete = () => {
-    props.onDelete(item, milestone, type, props.type)
+  const removable = props.item?.removable || props.milestone?.removable
+
+  let onDelete = false
+  if (removable) {
+    onDelete = () => {
+      props.onDelete(item, milestone, type, props.type)
+    }
   }
 
 
