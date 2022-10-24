@@ -236,7 +236,6 @@ class PlanningTool extends Component {
    * Event handler when dragging an item
    */
   handleItemDrag = ({eventType, itemId, time, edge, newGroupOrder}) => {
-    const {items} = this.state
     let item = this.state.draggedItem ? this.state.draggedItem.item : undefined
     if (!item) {
       item = this.state.items.find(i => i.id === itemId)
