@@ -120,13 +120,14 @@ class PlanningTool extends Component {
     item.selectedBgColor = item.selectedBgColor != null ? item.selectedBgColor : '#FFC107'
     item.selectedColor = item.selectedColor != null ? item.selectedColor : '#000000'
     item.draggingBgColor = item.draggingBgColor != null ? item.draggingBgColor : '#f00'
-    item.highlightBgColor = item.highlightBgColor != null ? item.highlightBgColor : '#FFA500'
+    item.highlightBgColor = item.highlightBgColor != null ? item.highlightBgColor : '#FFA555'
     item.highlight = item.highlight != null ? item.highlight : false
     item.canMove = item.canMove != null ? item.canMove : true
     item.canResize = item.canResize != null ? item.canResize : 'both'
     item.minimumDuration = item.minimumDuration != null ? item.minimumDuration : false
     item.maximumDuration = item.maximumDuration != null ? item.maximumDuration : false
     item.removable = item.removable != null ? item.removable : true
+    item.selectedGroup = false
   }
 
   setMilestoneDefault = (milestone) => {
@@ -159,18 +160,38 @@ class PlanningTool extends Component {
 
     const group = groups.filter(g => g.show)[newGroupOrder]
 
-    this.addUndoItem(items.find(i => i.id === itemId), Constants.ITEM_EDIT, {}, true)
+    const item = items.find(i => i.id === itemId)
+    const newStart = moment(dragTime), newEnd = moment(dragTime + (item.end - item.start))
+    const diff = newStart.diff(item.start)
+    const selectedItems = items.filter(
+      itemSelected =>
+        itemSelected.selectedGroup
+        && itemSelected.canMove
+        && item.id !== itemSelected.id
+    )
+
+    this.addUndoItem(item, Constants.ITEM_EDIT, {
+      selectedItems,
+      diff
+    }, true)
+
+    const index = items.indexOf(item)
+    items[index] = Object.assign({}, item, {
+      start: newStart,
+      end: newEnd,
+      group: group.id
+    })
+
+    selectedItems.forEach((itemSelected) => {
+      const index = items.indexOf(itemSelected)
+      items[index] = Object.assign({}, itemSelected, {
+        start: itemSelected.start.add(diff),
+        end: itemSelected.end.add(diff)
+      })
+    })
 
     this.setState({
-      items: items.map(item =>
-        item.id === itemId
-          ? Object.assign({}, item, {
-            start: moment(dragTime),
-            end: moment(dragTime + (item.end - item.start)),
-            group: group.id
-          })
-          : item
-      ),
+      items,
       draggedItem: undefined
     })
   }
@@ -215,6 +236,7 @@ class PlanningTool extends Component {
    * Event handler when dragging an item
    */
   handleItemDrag = ({eventType, itemId, time, edge, newGroupOrder}) => {
+    const {items} = this.state
     let item = this.state.draggedItem ? this.state.draggedItem.item : undefined
     if (!item) {
       item = this.state.items.find(i => i.id === itemId)
@@ -334,8 +356,16 @@ class PlanningTool extends Component {
     }
   }
 
+  removeSelectedGroups = () => {
+    const items = this.state.items.filter(item => item.selectedGroup)
+    for (const item of items) {
+      item.selectedGroup = false
+    }
+  }
+
   itemDeselected = () => {
     this.removeHighlight()
+    this.removeSelectedGroups()
 
     this.setState({
       items: this.state.items,
@@ -651,7 +681,15 @@ class PlanningTool extends Component {
     const {items} = this.state
     const undoItem = undoAction.item
 
-    this.addRedoItem(items.find(i => i.id === undoItem.id), undoAction.actionName)
+    this.addRedoItem(items.find(i => i.id === undoItem.id), undoAction.actionName, undoAction.params)
+
+    if (undoAction.params.selectedItems && undoAction.params.diff) {
+      undoAction.params.selectedItems.forEach((item) => {
+        const index = items.indexOf(items.find(i => i.id === item.id))
+        items[index].start = item.start.subtract(undoAction.params.diff)
+        items[index].end = item.end.subtract(undoAction.params.diff)
+      })
+    }
 
     this.setState({
       items: items.map(item =>
@@ -775,7 +813,15 @@ class PlanningTool extends Component {
   redoItemEdit = (redoAction) => {
     const {items} = this.state
     const redoItem = redoAction.item
-    this.addUndoItem(items.find(i => i.id === redoItem.id), redoAction.actionName)
+    this.addUndoItem(items.find(i => i.id === redoItem.id), redoAction.actionName, redoAction.params)
+
+    if (redoAction.params.selectedItems && redoAction.params.diff) {
+      redoAction.params.selectedItems.forEach((item) => {
+        const index = items.indexOf(items.find(i => i.id === item.id))
+        items[index].start = item.start.add(redoAction.params.diff)
+        items[index].end = item.end.add(redoAction.params.diff)
+      })
+    }
 
     this.setState({
       items: items.map(item =>
@@ -905,7 +951,7 @@ class PlanningTool extends Component {
     let backgroundColor = item.bgColor
     let color = item.color
 
-    if (itemContext.selected) {
+    if (itemContext.selected || item.selectedGroup) {
       color = item.selectedColor
       if (itemContext.dragging) {
         backgroundColor = item.draggingBgColor
@@ -934,12 +980,18 @@ class PlanningTool extends Component {
           /**
            * Event handler when click on an item
            */
-          onMouseDown: () => {
-            item.selected = true
-            this.removeHighlight()
-            this.highlightChildren(item)
-            this.highlightParents(item)
-            this.showItemInfo(this.state.items.find(i => i.id === item.id))
+          onMouseDown: (event) => {
+            if (event.ctrlKey) {
+              item.selectedGroup = true
+            } else {
+              item.selected = true
+              this.removeHighlight()
+              this.removeSelectedGroups()
+              this.highlightChildren(item)
+              this.highlightParents(item)
+              this.showItemInfo(this.state.items.find(i => i.id === item.id))
+            }
+
             this.setState({
               items: this.state.items
             })
