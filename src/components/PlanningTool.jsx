@@ -950,7 +950,7 @@ class PlanningTool extends Component {
     let backgroundColor = item.bgColor
     let color = item.color
 
-    if (itemContext.selected || item.selectedGroup) {
+    if (itemContext.selected) {
       color = item.selectedColor
       if (itemContext.dragging) {
         backgroundColor = item.draggingBgColor
@@ -959,6 +959,8 @@ class PlanningTool extends Component {
       }
     } else if (item.highlight) {
       backgroundColor = item.highlightBgColor
+    }else if(item.selectedGroup){
+      backgroundColor = '#c3073f'
     }
 
     if (itemContext.dimensions.width < 20) {
@@ -983,9 +985,12 @@ class PlanningTool extends Component {
             if (event.ctrlKey) {
               item.selectedGroup = true
             } else {
-              item.selected = true
               this.removeHighlight()
               this.removeSelectedGroups()
+
+              item.selected = true
+              item.selectedGroup = true
+
               this.highlightChildren(item)
               this.highlightParents(item)
               this.showItemInfo(this.state.items.find(i => i.id === item.id))
@@ -1895,6 +1900,10 @@ PlanningTool.defaultProps = {
     {
       name: "task group",
       color: "blue"
+    },
+    {
+      name: "group of selected tasks",
+      color: '#c3073f'
     }
   ]
 }
