@@ -445,6 +445,8 @@ class PlanningTool extends Component {
     this.setState({
       sidebarWidth: width,
     })
+
+    this.timeline.current.resize()
   }
 
   /**
@@ -1030,12 +1032,12 @@ class PlanningTool extends Component {
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
             zIndex: '100',
-            position: 'relative',
+            position: 'sticky',
+            left: 0,
+            maxWidth: 'fit-content'
           }}
         >
-          <div>
-            {itemContext.title}
-          </div>
+          {itemContext.title}
         </div>
 
         {/*dependencies of en item*/}
