@@ -16,7 +16,6 @@ import Modal from './Modal'
 import EditItemModal from './EditItemModal'
 import Constants from '../constants/Constants'
 import Legend from "./Legend";
-import * as propTypes from "prop-types";
 
 const keys = {
   groupIdKey: "id",
@@ -63,12 +62,14 @@ class PlanningTool extends Component {
       return accumulator
     }, [])
 
-    console.log(props.defaultTimeStart)
 
-    const defaultTimeStart = props.defaultTimeStart != null ? moment(props.defaultTimeStart)
-      : (items.length > 0 ? moment(items[0].start).add(-12, 'hour') : moment())
-    const defaultTimeEnd = props.defaultTimeEnd != null ? moment(props.defaultTimeEnd)
-      : (items.length > 0 ? moment(items[0].end).add(12, 'hour') : moment())
+    let defaultTimeStart = moment().subtract(24, 'hour')
+    let defaultTimeEnd = moment().add(24, 'hour')
+
+    if (items.length > 0) {
+      defaultTimeStart = moment(Math.min(...items.map(i => moment(i.start)))).subtract(12, 'hour')
+      defaultTimeEnd = moment(Math.max(...items.map(i => moment(i.end)))).add(12, 'hour')
+    }
 
     const sidebarWidth = 300
     const sidebarResizing = false
