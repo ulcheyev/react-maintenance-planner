@@ -164,7 +164,7 @@ export default class ReactCalendarTimeline extends Component {
   static defaultProps = {
     sidebarWidth: 150,
     rightSidebarWidth: 0,
-    dragSnap: 1000 * 60, // 1min
+    dragSnap: 1000 * 60 * 15, // 15min
     minResizeWidth: 20,
     stickyHeader: true,
     lineHeight: 30,
