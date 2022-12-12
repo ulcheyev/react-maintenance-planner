@@ -25,7 +25,8 @@
     "react-icons": "^4.4.0",
     "react-scripts": "5.0.0",
     "react-xarrows": "^2.0.2",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "webpack": "^5.75.0"
   },
   "scripts": {
     "start": "react-scripts start",

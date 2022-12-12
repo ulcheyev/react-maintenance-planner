@@ -966,10 +966,6 @@ class PlanningTool extends Component {
       backgroundColor = '#c3073f'
     }
 
-    if (itemContext.dimensions.width < 20) {
-      itemContext.dimensions.width = 20
-    }
-
     if (item.isHidden) {
       return null
     }
@@ -983,7 +979,6 @@ class PlanningTool extends Component {
           style: {
             background: backgroundColor,
             color: color,
-            minWidth: 20,
           },
           /**
            * Event handler when click on an item
