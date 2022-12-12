@@ -1627,7 +1627,19 @@ class PlanningTool extends Component {
   showOverview = () => {
     const {defaultTimeStart, defaultTimeEnd} = this.state
 
-    this.timeline.current.updateScrollCanvas(defaultTimeStart.valueOf(), defaultTimeEnd.valueOf())
+    this.timeline.current.updateScrollCanvas(
+      defaultTimeStart.valueOf(),
+      defaultTimeEnd.valueOf()
+    )
+  }
+
+  showCurrentWeek = () => {
+    const now = moment()
+
+    this.timeline.current.updateScrollCanvas(
+      now.clone().subtract(84, 'hour').valueOf(),
+      now.clone().add(84, 'hour').valueOf()
+    )
   }
 
   renderGroup = (group) => {
@@ -1815,6 +1827,12 @@ class PlanningTool extends Component {
                 onClick={this.showOverview}
               >
                 Overview
+              </button>
+              <button
+                className="action-button"
+                onClick={this.showCurrentWeek}
+              >
+                Center
               </button>
             </div>
           </div>
