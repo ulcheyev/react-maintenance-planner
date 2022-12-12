@@ -1624,6 +1624,12 @@ class PlanningTool extends Component {
     })
   }
 
+  showOverview = () => {
+    const {defaultTimeStart, defaultTimeEnd} = this.state
+
+    this.timeline.current.updateScrollCanvas(defaultTimeStart.valueOf(), defaultTimeEnd.valueOf())
+  }
+
   renderGroup = (group) => {
     const siblings = this.getSiblings(group)
     let ordering = false, orderDown = true, orderUp = true
@@ -1803,6 +1809,12 @@ class PlanningTool extends Component {
               <button className={`action-button ${this.redoActions.length <= 0 ? 'disabled' : ''}`}
                       onClick={this.redo}>
                 Redo
+              </button>
+              <button
+                className="action-button"
+                onClick={this.showOverview}
+              >
+                Overview
               </button>
             </div>
           </div>
