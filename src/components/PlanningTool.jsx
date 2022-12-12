@@ -959,12 +959,16 @@ class PlanningTool extends Component {
       }
     } else if (item.highlight) {
       backgroundColor = item.highlightBgColor
-    }else if(item.selectedGroup){
+    } else if (item.selectedGroup) {
       backgroundColor = '#c3073f'
     }
 
     if (itemContext.dimensions.width < 20) {
       itemContext.dimensions.width = 20
+    }
+
+    if (item.isHidden) {
+      return null
     }
 
     return (
