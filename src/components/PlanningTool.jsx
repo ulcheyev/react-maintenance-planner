@@ -1834,7 +1834,7 @@ class PlanningTool extends Component {
                 className="action-button"
                 onClick={this.showCurrentWeek}
               >
-                Center
+                Current week
               </button>
             </div>
           </div>
