@@ -67,8 +67,8 @@ class PlanningTool extends Component {
     let defaultTimeEnd = moment().add(24, 'hour')
 
     if (items.length > 0) {
-      defaultTimeStart = moment(Math.min(...items.map(i => moment(i.start)))).subtract(12, 'hour')
-      defaultTimeEnd = moment(Math.max(...items.map(i => moment(i.end)))).add(12, 'hour')
+      defaultTimeStart = moment(Math.min(...items.filter(i => i.start !== null).map(i => moment(i.start)))).subtract(12, 'hour')
+      defaultTimeEnd = moment(Math.max(...items.filter(i => i.end !== null).map(i => moment(i.end)))).add(12, 'hour')
     }
 
     const sidebarWidth = 300
