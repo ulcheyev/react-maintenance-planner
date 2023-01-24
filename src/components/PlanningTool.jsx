@@ -6,8 +6,8 @@ import {FaPlus, FaArrowUp, FaArrowDown} from 'react-icons/fa'
 import Timeline, {
   TodayMarker,
   CustomMarker
-} from "./timeline/src"
-import './timeline/src/lib/Timeline.css'
+} from "@kbss-cvut/react-calendar-timeline"
+import '@kbss-cvut/react-calendar-timeline/lib/Timeline.css'
 import Xarrow from "react-xarrows"
 import './../assets/PlanningTool.css'
 import PropTypes from "prop-types"
