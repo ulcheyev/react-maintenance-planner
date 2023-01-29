@@ -15,7 +15,6 @@ import Popup from './Popup'
 import Modal from './Modal'
 import EditItemModal from './EditItemModal'
 import Constants from '../constants/Constants'
-import Legend from "./Legend";
 
 const keys = {
   groupIdKey: "id",
@@ -1772,6 +1771,31 @@ class PlanningTool extends Component {
     return (
       <>
         <div className="timeline-container">
+          <div className="explanatory-notes-container">
+            {this.renderPopup(popup)}
+            {/*undo redo*/}
+            <div className="action-buttons">
+              <button className={`action-button ${this.actions.length <= 0 ? 'disabled' : ''}`} onClick={this.undo}>
+                Undo
+              </button>
+              <button className={`action-button ${this.redoActions.length <= 0 ? 'disabled' : ''}`}
+                      onClick={this.redo}>
+                Redo
+              </button>
+              <button
+                  className="action-button"
+                  onClick={this.showOverview}
+              >
+                Overview
+              </button>
+              <button
+                  className="action-button"
+                  onClick={this.showCurrentWeek}
+              >
+                Current week
+              </button>
+            </div>
+          </div>
           <Timeline className="timeline"
                     ref={this.timeline}
                     groups={newGroups}
@@ -1807,32 +1831,7 @@ class PlanningTool extends Component {
             {this.renderMilestones()}
 
           </Timeline>
-          <div className="explanatory-notes-container">
-            <Legend legendItems={this.props.legendItems} title="Legend"/>
-            {this.renderPopup(popup)}
-            {/*undo redo*/}
-            <div className="action-buttons">
-              <button className={`action-button ${this.actions.length <= 0 ? 'disabled' : ''}`} onClick={this.undo}>
-                Undo
-              </button>
-              <button className={`action-button ${this.redoActions.length <= 0 ? 'disabled' : ''}`}
-                      onClick={this.redo}>
-                Redo
-              </button>
-              <button
-                className="action-button"
-                onClick={this.showOverview}
-              >
-                Overview
-              </button>
-              <button
-                className="action-button"
-                onClick={this.showCurrentWeek}
-              >
-                Current week
-              </button>
-            </div>
-          </div>
+
         </div>
 
         {this.state.addResourceModal &&
@@ -1891,10 +1890,6 @@ PlanningTool.propTypes = {
     color: PropTypes.string,
     removable: PropTypes.bool,
   })),
-  legendItems: PropTypes.arrayOf(PropTypes.shape({
-    name: PropTypes.string,
-    color: PropTypes.string
-  })),
   defaultTimeStart: PropTypes.instanceOf(moment),
   defaultTimeEnd: PropTypes.instanceOf(moment),
 }
@@ -1920,23 +1915,5 @@ PlanningTool.defaultProps = {
   ],
   groups: [],
   popup: Popup,
-  legendItems: [
-    {
-      name: "scheduled_wo",
-      color: "red"
-    },
-    {
-      name: "maintenance_wo",
-      color: "green"
-    },
-    {
-      name: "task group",
-      color: "blue"
-    },
-    {
-      name: "group of selected tasks",
-      color: '#c3073f'
-    }
-  ]
 }
 export default PlanningTool
