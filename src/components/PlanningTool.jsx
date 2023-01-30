@@ -15,6 +15,8 @@ import Popup from './Popup'
 import Modal from './Modal'
 import EditItemModal from './EditItemModal'
 import Constants from '../constants/Constants'
+import Tippy from "@tippyjs/react";
+import 'tippy.js/dist/tippy.css';
 
 const keys = {
   groupIdKey: "id",
@@ -969,95 +971,107 @@ class PlanningTool extends Component {
       return null
     }
 
+    const groups = this.state.groups
+    const group = groups.find(g => g.id === item.group)
+
+    const dynamicTooltip = React.cloneElement(
+        this.props.tooltip,
+        {item: item, group: group}
+    );
+
     return (
-      <div
-        onMouseEnter={() => this.handleShowIconsOnMouseEnter(null, item.id)}
-        onMouseLeave={() => this.handleShowIconsOnMouseLeave(null, item.id)}
-        onKeyUp={(e) => this.handleInputFieldOnKeyUp(e, null, item.id)}
-        {...getItemProps({
-          style: {
-            background: backgroundColor,
-            color: color,
-          },
-          /**
-           * Event handler when click on an item
-           */
-          onMouseDown: (event) => {
-            if (event.ctrlKey) {
-              item.selectedGroup = true
-            } else {
-              this.removeHighlight()
-              this.removeSelectedGroups()
+        <Tippy
+            content={dynamicTooltip ? dynamicTooltip : null}
+          >
+          <div
+              onMouseEnter={() => this.handleShowIconsOnMouseEnter(null, item.id)}
+              onMouseLeave={() => this.handleShowIconsOnMouseLeave(null, item.id)}
+              onKeyUp={(e) => this.handleInputFieldOnKeyUp(e, null, item.id)}
+              {...getItemProps({
+                style: {
+                  background: backgroundColor,
+                  color: color,
+                },
+                /**
+                 * Event handler when click on an item
+                 */
+                onMouseDown: (event) => {
+                  if (event.ctrlKey) {
+                    item.selectedGroup = true
+                  } else {
+                    this.removeHighlight()
+                    this.removeSelectedGroups()
 
-              item.selected = true
-              item.selectedGroup = true
+                    item.selected = true
+                    item.selectedGroup = true
 
-              this.highlightChildren(item)
-              this.highlightParents(item)
-              this.showItemInfo(this.state.items.find(i => i.id === item.id))
+                    this.highlightChildren(item)
+                    this.highlightParents(item)
+                    this.showItemInfo(this.state.items.find(i => i.id === item.id))
+                  }
+
+                  this.setState({
+                    items: this.state.items
+                  })
+                },
+
+              })}
+              id={'item-' + item.id}
+              className={item.canMove ? 'movable-item' : 'static-item'}
+          >
+            {/*left resize*/}
+            {itemContext.selected && (item.canResize === 'both' || item.canResize === 'left') ?
+                itemContext.useResizeHandle ? <div {...leftResizeProps}/> : <span style={{
+                  cursor: 'ew-resize',
+                  width: 3,
+                  zIndex: 1000,
+                  position: 'absolute',
+                  top: 0,
+                  left: -3,
+                  height: '100%'
+                }}/> : ''}
+
+            <div
+                style={{
+                  height: itemContext.dimensions.height,
+                  overflow: "hidden",
+                  paddingLeft: 3,
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  zIndex: '100',
+                  position: 'sticky',
+                  left: 0,
+                  maxWidth: 'fit-content'
+                }}
+            >
+              {itemContext.title}
+            </div>
+
+            {/*dependencies of en item*/}
+            {item.dependency ?
+                <Xarrow
+                    start={'item-' + item.dependency}
+                    end={'item-' + item.id}
+                    strokeWidth={2}
+                    headSize={6}
+                />
+                :
+                ''
             }
 
-            this.setState({
-              items: this.state.items
-            })
-          },
-
-        })}
-        id={'item-' + item.id}
-        className={item.canMove ? 'movable-item' : 'static-item'}
-      >
-        {/*left resize*/}
-        {itemContext.selected && (item.canResize === 'both' || item.canResize === 'left') ?
-          itemContext.useResizeHandle ? <div {...leftResizeProps}/> : <span style={{
-            cursor: 'ew-resize',
-            width: 3,
-            zIndex: 1000,
-            position: 'absolute',
-            top: 0,
-            left: -3,
-            height: '100%'
-          }}/> : ''}
-
-        <div
-          style={{
-            height: itemContext.dimensions.height,
-            overflow: "hidden",
-            paddingLeft: 3,
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-            zIndex: '100',
-            position: 'sticky',
-            left: 0,
-            maxWidth: 'fit-content'
-          }}
-        >
-          {itemContext.title}
-        </div>
-
-        {/*dependencies of en item*/}
-        {item.dependency ?
-          <Xarrow
-            start={'item-' + item.dependency}
-            end={'item-' + item.id}
-            strokeWidth={2}
-            headSize={6}
-          />
-          :
-          ''
-        }
-
-        {/*right resize*/}
-        {itemContext.selected && (item.canResize === 'both' || item.canResize === 'right') ?
-          itemContext.useResizeHandle ? <div {...rightResizeProps}/> : <span style={{
-            cursor: 'ew-resize',
-            width: 3,
-            zIndex: 1000,
-            position: 'absolute',
-            top: 0,
-            right: -3,
-            height: '100%',
-          }}/> : ''}
-      </div>
+            {/*right resize*/}
+            {itemContext.selected && (item.canResize === 'both' || item.canResize === 'right') ?
+                itemContext.useResizeHandle ? <div {...rightResizeProps}/> : <span style={{
+                  cursor: 'ew-resize',
+                  width: 3,
+                  zIndex: 1000,
+                  position: 'absolute',
+                  top: 0,
+                  right: -3,
+                  height: '100%',
+                }}/> : ''}
+          </div>
+        </Tippy>
     )
   }
 
@@ -1772,7 +1786,6 @@ class PlanningTool extends Component {
       <>
         <div className="timeline-container">
           <div className="explanatory-notes-container">
-            {this.renderPopup(popup)}
             {/*undo redo*/}
             <div className="action-buttons">
               <button className={`action-button ${this.actions.length <= 0 ? 'disabled' : ''}`} onClick={this.undo}>
@@ -1892,6 +1905,7 @@ PlanningTool.propTypes = {
   })),
   defaultTimeStart: PropTypes.instanceOf(moment),
   defaultTimeEnd: PropTypes.instanceOf(moment),
+  tooltip: PropTypes.elementType.isRequired,
 }
 
 PlanningTool.defaultProps = {
@@ -1915,5 +1929,6 @@ PlanningTool.defaultProps = {
   ],
   groups: [],
   popup: Popup,
+  tooltip: <Popup />
 }
 export default PlanningTool
