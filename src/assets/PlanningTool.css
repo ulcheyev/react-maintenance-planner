@@ -25,38 +25,13 @@
   z-index: 100;
 }
 
-.explanatory-notes-container {
+.action-buttons-container {
   position: fixed;
   display: flex;
   padding: 2rem;
   flex-direction: column;
   top: 0;
   right: 0;
-}
-
-.explanatory-notes, .popup {
-  background-color: #dadada;
-  margin-top: 2rem;
-  padding: 1rem 1.5rem 2rem 1.5rem;
-  border: 1px solid #333;
-  width: 22rem;
-}
-
-.popup h4 {
-  margin-bottom: 1.25rem;
-}
-
-.explanatory-notes .note {
-  display: flex;
-  align-items: center;
-  padding-top: .5rem;
-}
-
-.explanatory-notes .note .legend-color {
-  background-color: #000;
-  width: 1.5rem;
-  height: 0.8rem;
-  margin-right: 1.3rem;
 }
 
 .static-item:after {
@@ -153,20 +128,6 @@
 .edit-icon svg:hover {
   opacity: .3;
   transition: .3s;
-}
-
-.progress-bar-container {
-  margin-top: 1rem;
-  border: solid #545454 1px;
-  background-color: rgb(121, 121, 121);
-  border-radius: .5rem;
-}
-
-.progress-bar {
-  background-color: rgb(62, 122, 235);
-  height: 10px;
-  border-radius: 1rem;
-  transition: 1s ease;
 }
 
 .rct-items .edit-icon svg {

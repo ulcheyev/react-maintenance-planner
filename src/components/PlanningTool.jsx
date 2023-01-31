@@ -11,7 +11,7 @@ import '@kbss-cvut/react-calendar-timeline/lib/Timeline.css'
 import Xarrow from "react-xarrows"
 import './../assets/PlanningTool.css'
 import PropTypes from "prop-types"
-import Popup from './Popup'
+import DefaultTooltip from './DefaultTooltip'
 import Modal from './Modal'
 import EditItemModal from './EditItemModal'
 import Constants from '../constants/Constants'
@@ -937,7 +937,7 @@ class PlanningTool extends Component {
               group: popup.group,
             })
             :
-            <Popup
+            <DefaultTooltip
               item={popup.item}
               group={popup.group}
             />
@@ -1785,7 +1785,7 @@ class PlanningTool extends Component {
     return (
       <>
         <div className="timeline-container">
-          <div className="explanatory-notes-container">
+          <div className="action-buttons-container">
             {/*undo redo*/}
             <div className="action-buttons">
               <button className={`action-button ${this.actions.length <= 0 ? 'disabled' : ''}`} onClick={this.undo}>
@@ -1928,7 +1928,7 @@ PlanningTool.defaultProps = {
     }
   ],
   groups: [],
-  popup: Popup,
-  tooltip: <Popup />
+  popup: DefaultTooltip,
+  tooltip: <DefaultTooltip />
 }
 export default PlanningTool
