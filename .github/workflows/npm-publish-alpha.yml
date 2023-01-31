@@ -34,7 +34,7 @@ jobs:
           node-version: 16
           registry-url: https://registry.npmjs.org
       - run: npm ci
-      - run: npm run build:lib
+      - run: npm run build:lib && npm pack
       - run: npm publish --access public --ignore-scripts --tag alpha
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
