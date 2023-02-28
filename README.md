@@ -36,3 +36,5 @@ Builds the static version of the storybook for production to the storybook-stati
 
 Build react-maintenance-planner library.
 
+-----
+This work has been supported by the grant [No. CK01000204 "Improving effectiveness of aircraft maintenance planning and execution"](https://starfos.tacr.cz/en/project/CK01000204) of Technology Agency of the Czech Republic.
