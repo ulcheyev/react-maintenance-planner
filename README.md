@@ -4,7 +4,7 @@
 React library used for planning maintenance.
 
 The library is based on [react-calendar-timeline](https://github.com/namespace-ee/react-calendar-timeline). <br/>
-Currently taken commit - [44bed94](https://github.com/namespace-ee/react-calendar-timeline/commit/44bed941f395f775fb86626933d55dcbd3401fb7). <br/>
+Currently taken commit - [9fd0f57](https://github.com/kbss-cvut/react-calendar-timeline/commit/9fd0f57f905bbffdd520a60a28cf93323704e057). <br/>
 The source code of the library is located in folder **src/components/timeline**.
 
 ## Live demo
