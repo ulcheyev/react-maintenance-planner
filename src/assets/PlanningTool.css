@@ -1,6 +1,7 @@
 .timeline-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: space-between;
   flex-wrap: nowrap;
   width: 100%;
 }
@@ -25,10 +26,14 @@
   z-index: 100;
 }
 
-.action-buttons-container {
-  position: fixed;
+.right-side-items-container {
   display: flex;
-  padding: 2rem;
+  flex-direction: column;
+}
+
+.action-buttons-container {
+  display: flex;
+  padding: 0 2rem 0 0;
   flex-direction: column;
   top: 0;
   right: 0;
@@ -85,7 +90,6 @@
   font-family: "Roboto", sans-serif;
   font-size: 1rem;
   transition-duration: .5s;
-  margin-top: 2rem;
   cursor: pointer;
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */

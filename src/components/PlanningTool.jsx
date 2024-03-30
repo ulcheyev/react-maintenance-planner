@@ -4,6 +4,7 @@ import {HiOutlinePencil} from "react-icons/hi";
 import {FaPlus, FaArrowUp, FaArrowDown} from 'react-icons/fa'
 
 import Timeline, {
+  TimelineMarkers,
   TodayMarker,
   CustomMarker
 } from "@kbss-cvut/react-calendar-timeline"
@@ -1672,7 +1673,7 @@ class PlanningTool extends Component {
         <div
           className="resource"
           onClick={() => this.toggleGroup(group.id)}
-          style={{cursor: 'pointer', paddingLeft: group.level * 20}}
+          style={{cursor: 'pointer', paddingLeft: group.level * 20, color:'#eae9e9'}}
         >
           {
             group.hasChildren ?
@@ -1714,7 +1715,7 @@ class PlanningTool extends Component {
           }
         </div>
 
-        {(group.showIcons || true) &&
+        {group.editable && (group.showIcons || true) &&
           <FaPlus className="add-resource" onClick={() => this.handleAddResource(group)}/>
         }
       </div>
@@ -1777,7 +1778,7 @@ class PlanningTool extends Component {
             }}
             onKeyUp={(e) => this.handleInputFieldOnKeyUp(e, group.id)}
           >
-            {this.renderGroup(group)}
+            {this.props.groupRenderer ? this.props.groupRenderer(group) : this.renderGroup(group)}
           </div>
       })
     })
@@ -1785,53 +1786,29 @@ class PlanningTool extends Component {
     return (
       <>
         <div className="timeline-container">
-          <div className="action-buttons-container">
-            {/*undo redo*/}
-            <div className="action-buttons">
-              <button className={`action-button ${this.actions.length <= 0 ? 'disabled' : ''}`} onClick={this.undo}>
-                Undo
-              </button>
-              <button className={`action-button ${this.redoActions.length <= 0 ? 'disabled' : ''}`}
-                      onClick={this.redo}>
-                Redo
-              </button>
-              <button
-                  className="action-button"
-                  onClick={this.showOverview}
-              >
-                Overview
-              </button>
-              <button
-                  className="action-button"
-                  onClick={this.showCurrentWeek}
-              >
-                Current week
-              </button>
-            </div>
-          </div>
           <Timeline className="timeline"
                     ref={this.timeline}
                     groups={newGroups}
                     items={items}
                     keys={keys}
                     fullUpdate
-                    itemTouchSendsClick={false}
+                    itemTouchSendsClick={this.props.itemTouchSendsClick ?? false}
                     stackItems
-                    itemHeightRatio={0.75}
+                    itemHeightRatio={this.props.itemHeightRatio ?? 0.75}
                     canMove={true}
                     canResize={"both"}
-                    sidebarWidth={sidebarWidth}
-                    defaultTimeStart={defaultTimeStart}
-                    defaultTimeEnd={defaultTimeEnd}
-                    onTimeChange={this.onTimeChange}
-                    itemRenderer={this.itemRenderer}
-                    onItemMove={this.handleItemMove}
-                    onItemResize={this.handleItemResize}
-                    onItemDeselect={this.itemDeselected}
-                    onItemDoubleClick={this.handleOnItemDoubleClick}
-                    onCanvasDoubleClick={this.handleOnCanvasDoubleClick}
-                    onItemDrag={this.handleItemDrag}
-                    handleSidebarResize={{
+                    sidebarWidth={this.props.sidebarWidth ?? sidebarWidth}
+                    defaultTimeStart={this.props.defaultTimeStart ?? defaultTimeStart}
+                    defaultTimeEnd={this.props.defaultTimeStart ?? defaultTimeEnd}
+                    onTimeChange={this.props.onTimeChange ?? this.onTimeChange}
+                    itemRenderer={this.props.itemRenderer ?? this.itemRenderer}
+                    onItemMove={this.props.onItemMove ?? this.handleItemMove}
+                    onItemResize={this.props.onItemResize ?? this.handleItemResize}
+                    onItemDeselect={this.props.onItemDeselect ?? this.itemDeselected}
+                    onItemDoubleClick={this.props.onItemDoubleClick ?? this.handleOnItemDoubleClick}
+                    onCanvasDoubleClick={this.props.onCanvasDoubleClick ?? this.handleOnCanvasDoubleClick}
+                    onItemDrag={this.props.onItemDrag ?? this.handleItemDrag}
+                    handleSidebarResize={this.props.handleSidebarResize ?? {
                       down: this.onSidebarDown,
                       move: this.onSidebarMove,
                       up: this.onSidebarUp,
@@ -1839,12 +1816,47 @@ class PlanningTool extends Component {
                     }}
           >
             {/*current time marker*/}
-            <TodayMarker interval={1000}/>
-
+            <TimelineMarkers>
+              <TodayMarker interval={1000}>
+                {({ styles, date }) => {
+                  const customStyles = {
+                    ...styles,
+                    ...this.props.todayMarkerStyles
+                  }
+                  return <div style={customStyles}/>
+                }}
+              </TodayMarker>
+            </TimelineMarkers>
             {this.renderMilestones()}
-
           </Timeline>
-
+          <div className="right-side-items-container">
+            <div className="action-buttons-container">
+              {/*undo redo*/}
+              <div className="action-buttons">
+                <button className={`action-button ${this.actions.length <= 0 ? 'disabled' : ''}`} onClick={this.undo}>
+                  Undo
+                </button>
+                <button className={`action-button ${this.redoActions.length <= 0 ? 'disabled' : ''}`}
+                        onClick={this.redo}>
+                  Redo
+                </button>
+                <button
+                    className="action-button"
+                    onClick={this.showOverview}
+                >
+                  Overview
+                </button>
+                <button
+                    className="action-button"
+                    onClick={this.showCurrentWeek}
+                >
+                  Current week
+                </button>
+              </div>
+            </div>
+            {this.props.additionalComponents.rightSideContainer}
+          </div>
+          {this.props.additionalComponents.mainContainer}
         </div>
 
         {this.state.addResourceModal &&
@@ -1883,10 +1895,10 @@ PlanningTool.propTypes = {
       minimumDuration: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf([false])]),
       maximumDuration: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf([false])]),
       workTime: PropTypes.number,
-      plannedWorkTime: PropTypes.number,
-      removable: PropTypes.bool,
+      plannedWorkTime: PropTypes.number
     }
   )).isRequired,
+  onItemDoubleClick: PropTypes.func,
   groups: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.number.isRequired,
     title: PropTypes.string.isRequired,
@@ -1903,9 +1915,23 @@ PlanningTool.propTypes = {
     color: PropTypes.string,
     removable: PropTypes.bool,
   })),
+  sidebarWidth: PropTypes.number,
   defaultTimeStart: PropTypes.instanceOf(moment),
   defaultTimeEnd: PropTypes.instanceOf(moment),
   tooltip: PropTypes.elementType.isRequired,
+  additionalComponents: PropTypes.object,
+  groupRenderer: PropTypes.func,
+  itemRenderer: PropTypes.func,
+  itemHeightRatio: PropTypes.number,
+  itemTouchSendsClick: PropTypes.bool,
+  todayMarkerStyles: PropTypes.object,
+  onTimeChange: PropTypes.func,
+  onItemMove: PropTypes.func,
+  onItemResize: PropTypes.func,
+  onItemDeselect: PropTypes.func,
+  onCanvasDoubleClick: PropTypes.func,
+  onItemDrag: PropTypes.func,
+  handleSidebarResize: PropTypes.object
 }
 
 PlanningTool.defaultProps = {
