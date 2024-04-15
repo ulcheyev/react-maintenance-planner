@@ -1,18 +1,18 @@
 //Story for default view of component
 
-import React from 'react'
-import PlanningTool from '../components/PlanningTool'
-import moment from 'moment'
+import React from "react";
+import PlanningTool from "../components/PlanningTool";
+import moment from "moment";
 
 export default {
   component: PlanningTool,
-  title: 'Planning tool',
+  title: "Planning tool",
   parameters: {
     actions: {
-      handles: ['click .rct-item'],
+      handles: ["click .rct-item"],
     },
   },
-}
+};
 
 const groups = [
   {

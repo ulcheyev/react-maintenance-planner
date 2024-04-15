@@ -1,5 +1,5 @@
 {
-  "name": "react-maintenance-planner",
+  "name": "@ulcheyev/react-maintenance-planner",
   "version": "0.1.1",
   "private": false,
   "source": "src/index.js",
@@ -98,5 +98,11 @@
     "prettier": "2.7.1",
     "prop-types": "^15.8.1",
     "standard-version": "^9.5.0"
-  }
+  },
+  "description": "[![Netlify Status](https://api.netlify.com/api/v1/badges/3169f575-1d8c-4b1d-a8b7-b229dea0f5ef/deploy-status)](https://app.netlify.com/sites/react-maintenance-planner/deploys)",
+  "directories": {
+    "doc": "doc"
+  },
+  "author": "ulcheyev",
+  "license": "ISC"
 }

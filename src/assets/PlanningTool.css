@@ -29,6 +29,7 @@
 .right-side-items-container {
   display: flex;
   flex-direction: column;
+  width: 23vw;
 }
 
 .action-buttons-container {
@@ -80,10 +81,12 @@
 .action-buttons {
   display: flex;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .action-button {
-  padding: 0.7rem;
+  padding-bottom: 0.5rem;
+  padding-top: 0.5rem;
   background-color: #fff;
   border: 1px solid #333;
   color: #333;

@@ -1,7 +1,7 @@
-import React from "react"
+import React from "react";
 
-const DefaultTooltip = ({item}) => {
-  return <p>{item.title}</p>
-}
+const DefaultTooltip = ({ item }) => {
+  return <p>{item.title}</p>;
+};
 
 export default DefaultTooltip

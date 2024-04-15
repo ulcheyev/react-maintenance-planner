@@ -1,19 +1,19 @@
 //Story with custom detail popup
 
-import React from 'react'
-import PlanningTool from '../components/PlanningTool'
-import moment from 'moment'
-import CustomPopup from './components/CustomPopup'
+import React from "react";
+import PlanningTool from "../components/PlanningTool";
+import moment from "moment";
+import CustomPopup from "./components/CustomPopup";
 
 export default {
   component: PlanningTool,
-  title: 'Custom popup',
+  title: "Custom popup",
   parameters: {
     actions: {
-      handles: ['click .rct-item'],
+      handles: ["click .rct-item"],
     },
   },
-}
+};
 
 const groups = [
   {
