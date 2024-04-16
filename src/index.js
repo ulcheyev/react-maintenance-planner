@@ -1,2 +1,1 @@
-import PlanningTool from './components/PlanningTool'
-export default PlanningTool
+export { default as PlanningTool } from './components/PlanningTool';

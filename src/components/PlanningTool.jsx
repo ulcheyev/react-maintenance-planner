@@ -10,7 +10,7 @@ import Timeline, {
 } from "@kbss-cvut/react-calendar-timeline";
 import "@kbss-cvut/react-calendar-timeline/lib/Timeline.css";
 import Xarrow from "react-xarrows";
-import "./../assets/PlanningTool.css";
+import '../assets/PlanningTool.css';
 import PropTypes from "prop-types";
 import DefaultTooltip from "./DefaultTooltip";
 import Modal from "./Modal";
@@ -1965,6 +1965,7 @@ class PlanningTool extends Component {
             groups={newGroups}
             items={items}
             keys={keys}
+            onZoom={this.props.onZoom}
             fullUpdate
             itemTouchSendsClick={this.props.itemTouchSendsClick ?? false}
             stackItems
@@ -2121,7 +2122,8 @@ PlanningTool.propTypes = {
   onCanvasDoubleClick: PropTypes.func,
   onItemDrag: PropTypes.func,
   handleSidebarResize: PropTypes.object,
-  horizontalLineClassNamesForGroup: PropTypes.arrayOf(PropTypes.string)
+  horizontalLineClassNamesForGroup: PropTypes.arrayOf(PropTypes.string),
+  onZoom: PropTypes.func
 }
 
 PlanningTool.defaultProps = {
