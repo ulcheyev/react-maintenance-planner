@@ -1,13 +1,12 @@
 {
   "name": "@ulcheyev/react-maintenance-planner",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "private": false,
   "source": "src/index.js",
   "main": "./dist/react-maintenance-planner.js",
-  "exports": {
-    "require": "./dist/react-maintenance-planner.js",
-    "default": "./dist/react-maintenance-planner.modern.js"
-  },
+  "files": [
+    "dist"
+  ],
   "module": "./dist/react-maintenance-planner.module.js",
   "unpkg": "./dist/react-maintenance-planner.umd.js",
   "dependencies": {
