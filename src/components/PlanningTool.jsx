@@ -1963,6 +1963,7 @@ class PlanningTool extends Component {
             className="timeline"
             ref={this.timeline}
             groups={newGroups}
+            lineHeight={this.props.lineHeight}
             items={items}
             keys={keys}
             onZoom={this.props.onZoom}
@@ -2123,7 +2124,8 @@ PlanningTool.propTypes = {
   onItemDrag: PropTypes.func,
   handleSidebarResize: PropTypes.object,
   horizontalLineClassNamesForGroup: PropTypes.arrayOf(PropTypes.string),
-  onZoom: PropTypes.func
+  onZoom: PropTypes.func,
+  lineHeight: PropTypes.number
 }
 
 PlanningTool.defaultProps = {
