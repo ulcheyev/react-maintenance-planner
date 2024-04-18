@@ -3,10 +3,15 @@ import moment from "moment";
 import { HiOutlinePencil } from "react-icons/hi";
 import { FaArrowDown, FaArrowUp, FaPlus } from "react-icons/fa";
 
+
 import Timeline, {
   CustomMarker,
   TimelineMarkers,
   TodayMarker,
+  TimelineHeaders,
+  SidebarHeader,
+  DateHeader,
+  CustomHeader
 } from "@kbss-cvut/react-calendar-timeline";
 import "@kbss-cvut/react-calendar-timeline/lib/Timeline.css";
 import Xarrow from "react-xarrows";
@@ -182,7 +187,6 @@ class PlanningTool extends Component {
    */
   handleItemMove = (itemId, dragTime, newGroupOrder) => {
     const { items, groups } = this.state;
-
     const group = groups.filter((g) => g.show)[newGroupOrder];
 
     const item = items.find((i) => i.id === itemId);
@@ -1769,21 +1773,22 @@ class PlanningTool extends Component {
     });
   };
 
+  zoomCanvas = (interval) => {
+    this.timeline.current.updateScrollCanvas(
+      interval.start.valueOf(),
+      interval.end.valueOf()
+    );
+  }
+
   showOverview = () => {
     const { defaultTimeStart, defaultTimeEnd } = this.state;
-
-    this.timeline.current.updateScrollCanvas(
-      defaultTimeStart.valueOf(),
-      defaultTimeEnd.valueOf()
-    );
+    this.zoomCanvas({start:defaultTimeStart, end:defaultTimeEnd})
   };
 
   showCurrentWeek = () => {
     const now = moment();
-    this.timeline.current.updateScrollCanvas(
-      now.clone().subtract(84, "hour").valueOf(),
-      now.clone().add(84, "hour").valueOf()
-    );
+    this.zoomCanvas({start:now.clone().subtract(84, "hour").valueOf(),
+      end: now.clone().add(84, "hour").valueOf()})
   };
 
   renderGroup = (group) => {
@@ -1915,6 +1920,10 @@ class PlanningTool extends Component {
     if (prevProps.items !== this.props.items) {
       this.setState({ items: this.props.items });
     }
+    if(!_.isEmpty(this.props.zoomInterval)
+      && prevProps.zoomInterval !== this.props.zoomInterval) {
+      this.zoomCanvas(this.props.zoomInterval)
+    }
   }
 
   render() {
@@ -1963,6 +1972,8 @@ class PlanningTool extends Component {
             className="timeline"
             ref={this.timeline}
             groups={newGroups}
+            minZoom={this.props.minZoom}
+            maxZoom={this.props.maxZoom}
             lineHeight={this.props.lineHeight}
             items={items}
             keys={keys}
@@ -1970,6 +1981,7 @@ class PlanningTool extends Component {
             fullUpdate
             itemTouchSendsClick={this.props.itemTouchSendsClick ?? false}
             stackItems
+            useResizeHandle={this.props.useResizeHandle}
             itemHeightRatio={this.props.itemHeightRatio ?? 0.75}
             canMove={true}
             canResize={"both"}
@@ -2012,6 +2024,13 @@ class PlanningTool extends Component {
                 }}
               </TodayMarker>
             </TimelineMarkers>
+            <TimelineHeaders>
+
+              <DateHeader unit="primaryHeader" />
+              <DateHeader
+                intervalRenderer={this.props.intervalRenderer}
+              />
+            </TimelineHeaders>
             {this.renderMilestones()}
           </Timeline>
           <div className="right-side-items-container">
@@ -2114,6 +2133,8 @@ PlanningTool.propTypes = {
   groupRenderer: PropTypes.func,
   itemRenderer: PropTypes.func,
   itemHeightRatio: PropTypes.number,
+  minZoom: PropTypes.number,
+  maxZoom: PropTypes.number,
   itemTouchSendsClick: PropTypes.bool,
   todayMarkerStyles: PropTypes.object,
   onTimeChange: PropTypes.func,
@@ -2125,7 +2146,10 @@ PlanningTool.propTypes = {
   handleSidebarResize: PropTypes.object,
   horizontalLineClassNamesForGroup: PropTypes.arrayOf(PropTypes.string),
   onZoom: PropTypes.func,
-  lineHeight: PropTypes.number
+  lineHeight: PropTypes.number,
+  useResizeHandle: PropTypes.bool,
+  zoomInterval: PropTypes.shape({start: PropTypes.number, end:PropTypes.number}),
+  intervalRenderer: PropTypes.func
 }
 
 PlanningTool.defaultProps = {
