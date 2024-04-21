@@ -3,19 +3,16 @@ import moment from "moment";
 import { HiOutlinePencil } from "react-icons/hi";
 import { FaArrowDown, FaArrowUp, FaPlus } from "react-icons/fa";
 
-
 import Timeline, {
   CustomMarker,
+  DateHeader,
+  TimelineHeaders,
   TimelineMarkers,
   TodayMarker,
-  TimelineHeaders,
-  SidebarHeader,
-  DateHeader,
-  CustomHeader
 } from "@kbss-cvut/react-calendar-timeline";
 import "@kbss-cvut/react-calendar-timeline/lib/Timeline.css";
 import Xarrow from "react-xarrows";
-import '../assets/PlanningTool.css';
+import "../assets/PlanningTool.css";
 import PropTypes from "prop-types";
 import DefaultTooltip from "./DefaultTooltip";
 import Modal from "./Modal";
@@ -2148,7 +2145,7 @@ PlanningTool.propTypes = {
   onZoom: PropTypes.func,
   lineHeight: PropTypes.number,
   useResizeHandle: PropTypes.bool,
-  zoomInterval: PropTypes.shape({start: PropTypes.number, end:PropTypes.number}),
+  zoomInterval: PropTypes.shape({start: PropTypes.instanceOf(moment), end:PropTypes.instanceOf(moment)}),
   intervalRenderer: PropTypes.func
 }
 
